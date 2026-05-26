@@ -1,0 +1,19 @@
+import { z } from "zod";
+
+export const registerSchema = z.object({
+  username: z.string().trim().min(3, "Username must be at least 3 characters").max(30).regex(/^[a-zA-Z0-9_]+$/, "Username may only contain letters, numbers, and underscores"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export const loginSchema = z.object({
+  username: z.string().trim().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const predictionSchema = z.object({
+  matchId: z.string().min(1, "Match ID is required"),
+  predictedHomeScore: z.number().int().min(0),
+  predictedAwayScore: z.number().int().min(0),
+});
+
+export const predictionUpdateSchema = predictionSchema.omit({ matchId: true });
