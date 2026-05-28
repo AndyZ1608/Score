@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getSession, hashPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -10,12 +10,13 @@ export async function POST(request: Request) {
 
   try {
     const user = await prisma.user.create({
-      data: { username: parsed.data.username, passwordHash: await hashPassword(parsed.data.password) },
-      select: { id: true, username: true, createdAt: true },
+      data: { username: parsed.data.username, passwordHash: await hashPassword(parsed.data.password), role: UserRole.USER, isHidden: false },
+      select: { id: true, username: true, role: true, createdAt: true },
     });
     const session = await getSession();
     session.userId = user.id;
     session.username = user.username;
+    session.role = user.role;
     await session.save();
     return NextResponse.json({ user }, { status: 201 });
   } catch (error) {

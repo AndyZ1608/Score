@@ -21,33 +21,56 @@ enum MatchResult {
   AWAY
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id           String       @id @default(cuid())
   username     String       @unique
   passwordHash String
+  role         UserRole     @default(USER)
+  isHidden     Boolean      @default(false)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   predictions  Prediction[]
 }
 
 model Match {
-  id           String       @id @default(cuid())
-  externalId   String       @unique
-  homeTeam     String
-  awayTeam     String
-  kickoffTime  DateTime
-  stadium      String?
-  stage        String?
-  groupName    String?
-  status       MatchStatus  @default(SCHEDULED)
-  homeScore    Int?
-  awayScore    Int?
-  minute       Int?
-  actualResult MatchResult?
-  lastSyncedAt DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  predictions  Prediction[]
+  id                     String       @id @default(cuid())
+  externalId             String       @unique
+  homeTeam               String
+  awayTeam               String
+  homeTeamLogo           String?
+  awayTeamLogo           String?
+  kickoffTime            DateTime
+  stadium                String?
+  country                String?
+  stage                  String?
+  groupName              String?
+  round                  String?
+  status                 MatchStatus  @default(SCHEDULED)
+  homeScore              Int?
+  awayScore              Int?
+  minute                 Int?
+  actualResult           MatchResult?
+  source                 String       @default("mock")
+  providerHomeScore      Int?
+  providerAwayScore      Int?
+  providerStatus         MatchStatus?
+  providerUpdatedAt      DateTime?
+  resultSource           String       @default("PROVIDER")
+  adminHomeScore         Int?
+  adminAwayScore         Int?
+  adminStatus            MatchStatus?
+  adminResultUpdatedAt   DateTime?
+  adminResultUpdatedById String?
+  adminNote              String?
+  lastSyncedAt           DateTime?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  predictions            Prediction[]
 }
 
 model Prediction {

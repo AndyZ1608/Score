@@ -5,16 +5,25 @@ export interface ExternalMatch {
   externalId: string;
   homeTeam: string;
   awayTeam: string;
+  homeTeamLogo?: string | null;
+  awayTeamLogo?: string | null;
   kickoffTime: Date;
   stadium?: string;
+  country?: string | null;
   stage?: string;
   groupName?: string;
+  round?: string | null;
   status: MatchStatus;
   homeScore: number | null;
   awayScore: number | null;
   minute: number | null;
   actualResult: MatchResult | null;
   lastUpdatedAt: Date | null;
+  source: string;
+  providerHomeScore: number | null;
+  providerAwayScore: number | null;
+  providerStatus: MatchStatus;
+  providerUpdatedAt: Date | null;
 }
 
 export interface FootballDataProvider {
@@ -92,12 +101,21 @@ export function mockFixtures(now = new Date()): ExternalMatch[] {
         stadium,
         stage,
         groupName,
+        homeTeamLogo: null,
+        awayTeamLogo: null,
+        country: null,
+        round: null,
         status: normalizeMatchStatus(status),
         homeScore,
         awayScore,
         minute,
         actualResult: status === "FINISHED" ? result(homeScore, awayScore) : null,
         lastUpdatedAt: now,
+        source: "mock",
+        providerHomeScore: homeScore,
+        providerAwayScore: awayScore,
+        providerStatus: normalizeMatchStatus(status),
+        providerUpdatedAt: now,
       },
       now,
     ),
@@ -138,17 +156,117 @@ export class FootballDataOrgProvider implements FootballDataProvider {
         homeTeam: String((raw.homeTeam as { name?: string })?.name ?? "TBD"),
         awayTeam: String((raw.awayTeam as { name?: string })?.name ?? "TBD"),
         kickoffTime: new Date(String(raw.utcDate)),
+        homeTeamLogo: null,
+        awayTeamLogo: null,
+        country: null,
         stage: raw.stage ? String(raw.stage) : undefined,
         groupName: raw.group ? String(raw.group) : undefined,
+        round: null,
         status,
         homeScore,
         awayScore,
         minute: status === MatchStatus.LIVE ? minute : null,
         actualResult: status === MatchStatus.FINISHED ? result(homeScore, awayScore) : null,
         lastUpdatedAt,
+        source: "football-data-org",
+        providerHomeScore: homeScore,
+        providerAwayScore: awayScore,
+        providerStatus: status,
+        providerUpdatedAt: lastUpdatedAt,
       };
     });
   }
+}
+
+export class TheSportsDBProvider implements FootballDataProvider {
+  async fetchMatches(): Promise<ExternalMatch[]> {
+    const apiKey = process.env.THESPORTSDB_API_KEY;
+    const leagueId = process.env.THESPORTSDB_LEAGUE_ID;
+    const season = process.env.THESPORTSDB_SEASON || "2026";
+    const baseUrl = process.env.THESPORTSDB_BASE_URL || "https://www.thesportsdb.com/api/v1/json";
+    if (!apiKey) throw new Error("THESPORTSDB_API_KEY is required when FOOTBALL_API_PROVIDER=thesportsdb");
+    if (!leagueId) throw new Error("THESPORTSDB_LEAGUE_ID is required when FOOTBALL_API_PROVIDER=thesportsdb");
+
+    const response = await fetch(`${baseUrl}/${apiKey}/eventsseason.php?id=${leagueId}&s=${season}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`TheSportsDB request failed (${response.status})`);
+
+    const payload = (await response.json()) as { events?: Record<string, unknown>[] | null };
+    const events = payload.events ?? [];
+    if (!Array.isArray(events)) throw new Error("TheSportsDB returned invalid events payload");
+
+    return events.map((event) => {
+      const homeScore = parseNullableInt(event.intHomeScore);
+      const awayScore = parseNullableInt(event.intAwayScore);
+      const status = normalizeTheSportsDBStatus(event, homeScore, awayScore);
+      const kickoffTime = parseTheSportsDBKickoff(event);
+      const lastUpdatedAt = new Date();
+
+      return {
+        externalId: String(event.idEvent),
+        homeTeam: String(event.strHomeTeam ?? "TBD"),
+        awayTeam: String(event.strAwayTeam ?? "TBD"),
+        homeTeamLogo: nullableString(event.strHomeTeamBadge),
+        awayTeamLogo: nullableString(event.strAwayTeamBadge),
+        kickoffTime,
+        stadium: nullableString(event.strVenue) ?? undefined,
+        country: nullableString(event.strCountry),
+        stage: nullableString(event.strLeague) ?? undefined,
+        groupName: null,
+        round: event.intRound === null || event.intRound === undefined ? null : String(event.intRound),
+        status,
+        homeScore,
+        awayScore,
+        minute: status === MatchStatus.LIVE ? getProviderMinute(event) : null,
+        actualResult: status === MatchStatus.FINISHED ? result(homeScore, awayScore) : null,
+        lastUpdatedAt,
+        source: "thesportsdb",
+        providerHomeScore: homeScore,
+        providerAwayScore: awayScore,
+        providerStatus: status,
+        providerUpdatedAt: lastUpdatedAt,
+      };
+    });
+  }
+}
+
+function normalizeTheSportsDBStatus(event: Record<string, unknown>, homeScore: number | null, awayScore: number | null): MatchStatus {
+  const postponed = String(event.strPostponed ?? "").trim().toLowerCase() === "yes";
+  if (postponed) return MatchStatus.POSTPONED;
+  const status = String(event.strStatus ?? "").trim().toUpperCase();
+  if (["PST"].includes(status)) return MatchStatus.POSTPONED;
+  if (["CANC", "ABD"].includes(status)) return MatchStatus.CANCELLED;
+  if (["1H", "2H", "HT", "ET", "BT", "P", "LIVE"].includes(status)) return MatchStatus.LIVE;
+  if (["FT", "AET", "PEN"].includes(status)) return MatchStatus.FINISHED;
+  if (status === "NS") return MatchStatus.SCHEDULED;
+  if (homeScore !== null && awayScore !== null) return MatchStatus.FINISHED;
+  return normalizeMatchStatus(status || "SCHEDULED");
+}
+
+function parseTheSportsDBKickoff(event: Record<string, unknown>): Date {
+  const timestamp = nullableString(event.strTimestamp);
+  if (timestamp) {
+    const normalized = /(?:z|[+-]\d{2}:?\d{2})$/i.test(timestamp) ? timestamp : `${timestamp}Z`;
+    const parsed = new Date(normalized);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+
+  const date = nullableString(event.dateEvent);
+  const time = nullableString(event.strTime) ?? "00:00:00";
+  const parsed = new Date(`${date ?? "1970-01-01"}T${time}Z`);
+  if (!Number.isNaN(parsed.getTime())) return parsed;
+  throw new Error(`Invalid TheSportsDB kickoff for event ${String(event.idEvent ?? "unknown")}`);
+}
+
+function parseNullableInt(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isInteger(parsed) ? parsed : null;
+}
+
+function nullableString(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  const stringValue = String(value).trim();
+  return stringValue ? stringValue : null;
 }
 
 function getProviderMinute(raw: Record<string, unknown>): number | null {
@@ -158,12 +276,19 @@ function getProviderMinute(raw: Record<string, unknown>): number | null {
 }
 
 export function getProvider(): FootballDataProvider {
-  switch (process.env.FOOTBALL_API_PROVIDER || "mock") {
+  const configuredProvider = process.env.FOOTBALL_API_PROVIDER;
+  if (!configuredProvider && process.env.NODE_ENV === "production") {
+    throw new Error("FOOTBALL_API_PROVIDER must be configured in production");
+  }
+
+  switch (configuredProvider || "mock") {
     case "mock":
       return new MockProvider();
     case "football-data-org":
       return new FootballDataOrgProvider();
+    case "thesportsdb":
+      return new TheSportsDBProvider();
     default:
-      throw new Error("FOOTBALL_API_PROVIDER must be mock or football-data-org");
+      throw new Error("FOOTBALL_API_PROVIDER must be mock, football-data-org, or thesportsdb");
   }
 }

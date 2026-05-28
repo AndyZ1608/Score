@@ -6,6 +6,7 @@ export async function GET() {
   const session = await getSession();
   if (!session.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const users = await prisma.user.findMany({
+    where: { role: "USER", isHidden: false },
     select: { id: true, username: true, predictions: { select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } },
   });
   const leaderboard = users

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function LeaderboardPage() {
   const { userId } = await requireAuth();
-  const users = await prisma.user.findMany({ select: { id: true, username: true, predictions: { select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } } });
+  const users = await prisma.user.findMany({ where: { role: "USER", isHidden: false }, select: { id: true, username: true, predictions: { select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } } });
   const rows = users.map((user) => ({
     userId: user.id,
     username: user.username,

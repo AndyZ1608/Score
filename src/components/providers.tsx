@@ -6,6 +6,7 @@ import { Toaster } from "sonner"
 interface SessionContextType {
   userId?: string
   username?: string
+  role?: string
   isLoading: boolean
   refresh: () => Promise<void>
 }
@@ -20,11 +21,12 @@ export function SessionProvider({
   initialUser,
 }: {
   children: React.ReactNode
-  initialUser?: { userId?: string; username?: string }
+  initialUser?: { userId?: string; username?: string; role?: string }
 }) {
-  const [session, setSession] = React.useState<{ userId?: string; username?: string }>({
+  const [session, setSession] = React.useState<{ userId?: string; username?: string; role?: string }>({
     userId: initialUser?.userId,
     username: initialUser?.username,
+    role: initialUser?.role,
   })
   const [isLoading, setIsLoading] = React.useState(!initialUser)
 
@@ -37,6 +39,7 @@ export function SessionProvider({
           setSession({
             userId: data.user.id,
             username: data.user.username,
+            role: data.user.role,
           })
         } else {
           setSession({})
@@ -74,7 +77,7 @@ export function Providers({
   initialUser,
 }: {
   children: React.ReactNode
-  initialUser?: { userId?: string; username?: string }
+  initialUser?: { userId?: string; username?: string; role?: string }
 }) {
   return (
     <SessionProvider initialUser={initialUser}>

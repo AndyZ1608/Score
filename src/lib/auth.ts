@@ -1,11 +1,14 @@
 import bcrypt from "bcryptjs";
+import { UserRole } from "@prisma/client";
 import { getIronSession, type SessionOptions } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 export interface SessionData {
   userId?: string;
   username?: string;
+  role?: UserRole;
 }
 
 function getSessionOptions(): SessionOptions {
@@ -33,7 +36,15 @@ export async function getSession() {
 export async function requireAuth() {
   const session = await getSession();
   if (!session.userId || !session.username) redirect("/login");
-  return { userId: session.userId, username: session.username };
+  return { userId: session.userId, username: session.username, role: session.role ?? UserRole.USER };
+}
+
+export async function requireAdmin() {
+  const session = await getSession();
+  if (!session.userId || !session.username) redirect("/login");
+  const user = await prisma.user.findUnique({ where: { id: session.userId }, select: { id: true, username: true, role: true } });
+  if (!user || user.role !== UserRole.ADMIN) redirect("/dashboard");
+  return user;
 }
 
 export function hashPassword(password: string) {

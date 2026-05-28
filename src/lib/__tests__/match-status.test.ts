@@ -10,12 +10,14 @@ describe("match status helpers", () => {
 
   it("normalizes finished statuses", () => {
     expect(normalizeMatchStatus("FT")).toBe(MatchStatus.FINISHED);
+    expect(normalizeMatchStatus("FULL_TIME")).toBe(MatchStatus.FINISHED);
     expect(isFinishedMatch("FINISHED")).toBe(true);
     expect(shouldCalculateScore("FULL_TIME")).toBe(true);
   });
 
   it("normalizes cancelled and unknown statuses", () => {
     expect(normalizeMatchStatus("cancelled")).toBe(MatchStatus.CANCELLED);
+    expect(normalizeMatchStatus("NS")).toBe(MatchStatus.SCHEDULED);
     expect(normalizeMatchStatus("TIMED")).toBe(MatchStatus.SCHEDULED);
   });
 });

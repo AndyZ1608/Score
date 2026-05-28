@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const TEST_USERNAMES = ["testuser", "demo", "admin", "test", "alice", "bob"] as const;
+const TEST_USERNAMES = ["testuser", "demo", "test", "alice", "bob"] as const;
 
 async function main() {
   if (process.env.CONFIRM_DELETE_TEST_USERS !== "true") {

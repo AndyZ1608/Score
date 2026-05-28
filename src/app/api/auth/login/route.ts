@@ -13,6 +13,7 @@ export async function POST(request: Request) {
   const session = await getSession();
   session.userId = user.id;
   session.username = user.username;
+  session.role = user.role;
   await session.save();
-  return NextResponse.json({ user: { id: user.id, username: user.username, createdAt: user.createdAt } });
+  return NextResponse.json({ user: { id: user.id, username: user.username, role: user.role, createdAt: user.createdAt } });
 }

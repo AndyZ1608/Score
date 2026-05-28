@@ -3,14 +3,14 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, X, Trophy, Calendar, LayoutDashboard, LogOut } from "lucide-react"
+import { Menu, X, Trophy, Calendar, LayoutDashboard, LogOut, Shield } from "lucide-react"
 import { useSession } from "@/components/providers"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { UserAvatar } from "@/components/user-avatar"
 
 export function Navbar() {
-  const { userId, username, refresh } = useSession()
+  const { userId, username, role, refresh } = useSession()
   const pathname = usePathname()
   const router = useRouter()
   const [isOpen, setIsOpen] = React.useState(false)
@@ -47,6 +47,7 @@ export function Navbar() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/matches", label: "Matches", icon: Calendar },
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+    ...(role === "ADMIN" ? [{ href: "/admin", label: "Admin", icon: Shield }] : []),
   ]
 
   const isActive = (href: string) => pathname === href
