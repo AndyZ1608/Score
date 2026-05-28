@@ -11,12 +11,13 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
   if (!match) notFound();
   const prediction = match.predictions[0] ?? null;
   const locked = match.status !== "SCHEDULED" || match.kickoffTime <= new Date();
+  const showScore = match.kickoffTime <= new Date() && (match.status === "FINISHED" || match.status === "LIVE");
   return (
     <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-[1.2fr_0.8fr]">
       <Card className="premium-card-gradient border-zinc-800">
         <CardHeader><CardTitle>{match.homeTeam} vs {match.awayTeam}</CardTitle><p className="text-sm text-zinc-400"><LocalKickoff value={match.kickoffTime} /> | {match.stadium}</p></CardHeader>
         <CardContent className="space-y-6">
-          {(match.status === "FINISHED" || match.status === "LIVE") && <div className="text-center text-5xl font-bold">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</div>}
+          {showScore && <div className="text-center text-5xl font-bold">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</div>}
           <PredictionForm matchId={match.id} homeTeam={match.homeTeam} awayTeam={match.awayTeam} prediction={prediction} locked={locked} />
           {match.status === "FINISHED" && prediction && <p className="rounded-lg bg-emerald-500/10 p-4 text-emerald-300">Points earned: <strong>{prediction.totalPoints}</strong></p>}
         </CardContent>

@@ -9,11 +9,17 @@ export async function POST(request: Request) {
   try {
     const matches = await getProvider().fetchMatches();
     for (const match of matches) {
-      await prisma.match.upsert({
+      const savedMatch = await prisma.match.upsert({
         where: { externalId: match.externalId },
         update: match,
         create: match,
       });
+      if (match.status !== "FINISHED") {
+        await prisma.prediction.updateMany({
+          where: { matchId: savedMatch.id },
+          data: { pointsResult: 0, pointsExactScore: 0, totalPoints: 0, isCalculated: false },
+        });
+      }
     }
     await prisma.syncLog.create({
       data: { provider: providerName, jobType: "SYNC_MATCHES", status: "SUCCESS", message: `${matches.length} matches synced` },

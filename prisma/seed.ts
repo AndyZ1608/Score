@@ -21,7 +21,7 @@ async function main() {
   for (const fixture of mockFixtures()) {
     await prisma.match.upsert({
       where: { externalId: fixture.externalId },
-      update: {},
+      update: fixture,
       create: fixture,
     });
   }
@@ -49,19 +49,22 @@ async function main() {
     const predictedResult = getResult(home, away);
     const pointsResult = finished && predictedResult === actualResult ? 1 : 0;
     const pointsExactScore = finished && home === match.homeScore && away === match.awayScore ? 3 : 0;
+    const predictionData = {
+      predictedHomeScore: home,
+      predictedAwayScore: away,
+      predictedResult,
+      pointsResult,
+      pointsExactScore,
+      totalPoints: pointsResult + pointsExactScore,
+      isCalculated: finished,
+    };
     await prisma.prediction.upsert({
       where: { userId_matchId: { userId: user.id, matchId: match.id } },
-      update: {},
+      update: predictionData,
       create: {
         userId: user.id,
         matchId: match.id,
-        predictedHomeScore: home,
-        predictedAwayScore: away,
-        predictedResult,
-        pointsResult,
-        pointsExactScore,
-        totalPoints: pointsResult + pointsExactScore,
-        isCalculated: finished,
+        ...predictionData,
       },
     });
   }

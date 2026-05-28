@@ -23,6 +23,8 @@ export function LocalKickoff({ value }: { value: Date | string }) {
 
 export function MatchCard({ match }: { match: MatchWithPrediction }) {
   const locked = match.status !== "SCHEDULED" || new Date(match.kickoffTime).getTime() <= Date.now();
+  const hasKickedOff = new Date(match.kickoffTime).getTime() <= Date.now();
+  const showScore = hasKickedOff && (match.status === "FINISHED" || match.status === "LIVE");
   return (
     <Card className="premium-card-gradient border-zinc-800 transition hover:border-indigo-500/30">
       <CardContent className="space-y-5 p-5">
@@ -33,7 +35,7 @@ export function MatchCard({ match }: { match: MatchWithPrediction }) {
         <div className="flex items-center gap-3 text-xs text-zinc-400"><CalendarClock className="h-4 w-4 text-indigo-400" /><LocalKickoff value={match.kickoffTime} /></div>
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-center font-semibold">
           <span>{match.homeTeam}</span>
-          {match.status === "FINISHED" || match.status === "LIVE" ? <span className="rounded-lg bg-zinc-900 px-3 py-2 text-lg">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</span> : <span className="text-xs text-zinc-500">VS</span>}
+          {showScore ? <span className="rounded-lg bg-zinc-900 px-3 py-2 text-lg">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</span> : <span className="text-xs text-zinc-500">VS</span>}
           <span>{match.awayTeam}</span>
         </div>
         {match.prediction && <div className="rounded-lg bg-zinc-900/80 px-3 py-2 text-sm text-zinc-300">Your prediction: <strong>{match.prediction.predictedHomeScore} - {match.prediction.predictedAwayScore}</strong>{match.prediction.isCalculated && <span className="float-right text-emerald-400">+{match.prediction.totalPoints} pts</span>}</div>}

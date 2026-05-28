@@ -18,6 +18,27 @@ export interface FootballDataProvider {
   fetchMatches(): Promise<ExternalMatch[]>;
 }
 
+function normalizeMockMatch(match: ExternalMatch, now = new Date()): ExternalMatch {
+  if (match.kickoffTime > now && match.status !== MatchStatus.POSTPONED) {
+    return {
+      ...match,
+      status: MatchStatus.SCHEDULED,
+      homeScore: null,
+      awayScore: null,
+      actualResult: null,
+    };
+  }
+
+  if (match.status !== MatchStatus.FINISHED) {
+    return {
+      ...match,
+      actualResult: null,
+    };
+  }
+
+  return match;
+}
+
 const fixtures = [
   ["M001", "Mexico", "South Africa", "2026-06-11T19:00:00Z", "Estadio Azteca", "Group Stage", "A", "FINISHED", 2, 1],
   ["M002", "Canada", "Switzerland", "2026-06-12T19:00:00Z", "BMO Field", "Group Stage", "B", "FINISHED", 1, 1],
@@ -50,20 +71,25 @@ function result(homeScore: number | null, awayScore: number | null) {
   return MatchResult.DRAW;
 }
 
-export function mockFixtures(): ExternalMatch[] {
-  return fixtures.map(([externalId, homeTeam, awayTeam, date, stadium, stage, groupName, status, homeScore, awayScore]) => ({
-    externalId,
-    homeTeam,
-    awayTeam,
-    kickoffTime: new Date(date),
-    stadium,
-    stage,
-    groupName,
-    status: MatchStatus[status],
-    homeScore,
-    awayScore,
-    actualResult: status === "FINISHED" ? result(homeScore, awayScore) : null,
-  }));
+export function mockFixtures(now = new Date()): ExternalMatch[] {
+  return fixtures.map(([externalId, homeTeam, awayTeam, date, stadium, stage, groupName, status, homeScore, awayScore]) =>
+    normalizeMockMatch(
+      {
+        externalId,
+        homeTeam,
+        awayTeam,
+        kickoffTime: new Date(date),
+        stadium,
+        stage,
+        groupName,
+        status: MatchStatus[status],
+        homeScore,
+        awayScore,
+        actualResult: status === "FINISHED" ? result(homeScore, awayScore) : null,
+      },
+      now,
+    ),
+  );
 }
 
 export class MockProvider implements FootballDataProvider {
