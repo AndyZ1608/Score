@@ -17,4 +17,18 @@ describe("mockFixtures", () => {
       }
     }
   });
+
+  it("can simulate live and finished matches when the clock is inside the fixture window", () => {
+    const matches = mockFixtures(new Date("2026-06-13T22:30:00Z"));
+    const finished = matches.find((match) => match.externalId === "M001");
+    const live = matches.find((match) => match.externalId === "M005");
+
+    expect(finished?.status).toBe(MatchStatus.FINISHED);
+    expect(finished?.homeScore).toBe(2);
+    expect(finished?.awayScore).toBe(1);
+    expect(live?.status).toBe(MatchStatus.LIVE);
+    expect(live?.homeScore).toBe(1);
+    expect(live?.awayScore).toBe(0);
+    expect(live?.minute).toBe(67);
+  });
 });

@@ -21,7 +21,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
     else all.push({ date, matches: [match] });
     return all;
   }, []);
-  const tabs: Array<[string, string | undefined]> = [["All", undefined], ["Scheduled", "SCHEDULED"], ["Live", "LIVE"], ["Finished", "FINISHED"]];
+  const tabs: Array<[string, string | undefined]> = [["All", undefined], ["Scheduled", "SCHEDULED"], ["Live", "LIVE"], ["Finished", "FINISHED"], ["Postponed", "POSTPONED"], ["Cancelled", "CANCELLED"]];
   return (
     <div className="space-y-7">
       <div><h1 className="text-3xl font-bold">Matches</h1><p className="mt-2 text-zinc-400">World Cup 2026 fixtures and your predictions.</p></div>

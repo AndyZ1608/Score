@@ -5,10 +5,11 @@ const prisma = new PrismaClient();
 
 async function main() {
   for (const fixture of mockFixtures()) {
+    const { lastUpdatedAt, ...matchData } = fixture;
     await prisma.match.upsert({
       where: { externalId: fixture.externalId },
-      update: fixture,
-      create: fixture,
+      update: { ...matchData, lastSyncedAt: lastUpdatedAt },
+      create: { ...matchData, lastSyncedAt: lastUpdatedAt },
     });
   }
 

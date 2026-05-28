@@ -12,6 +12,7 @@ World Cup 2026 score prediction app built with Next.js, PostgreSQL, Prisma, encr
 
 The initial seed is idempotent and only syncs mock fixtures; it does not create demo users.
 When serving through HTTPS, set `SESSION_COOKIE_SECURE="true"` in `.env`.
+Docker Compose includes a `scheduler` service that calls match sync and score calculation every 60 seconds.
 
 To remove old demo/test users from an existing database:
 
@@ -38,6 +39,7 @@ curl -X POST http://localhost/api/cron/calculate-scores \
 ```
 
 `FOOTBALL_API_PROVIDER=mock` supplies the bundled fixtures. To use the provider skeleton, set `FOOTBALL_API_PROVIDER=football-data-org` and provide `FOOTBALL_API_KEY`.
+Live scores are synced server-side by the scheduler; clients see updated scores after page reloads.
 
 ## Dev mode
 

@@ -6,6 +6,7 @@ import type { Match, Prediction } from "@prisma/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { TeamNameBadge } from "@/components/team-name-badge";
 import { formatMatchDateTime } from "@/lib/date-format";
+import { getPredictionLockTime, isPredictionLocked } from "@/lib/prediction-lock";
 
 export type MatchWithPrediction = Match & { prediction?: Prediction | null };
 
@@ -15,12 +16,14 @@ function StatusBadge({ status }: { status: Match["status"] }) {
     LIVE: "border-red-400/40 bg-red-400/15 text-red-200 animate-pulse",
     FINISHED: "border-emerald-300/30 bg-emerald-300/10 text-emerald-200",
     POSTPONED: "border-zinc-400/20 bg-zinc-400/10 text-zinc-300",
+    CANCELLED: "border-zinc-400/20 bg-zinc-400/10 text-zinc-300",
   }[status];
   const label = {
     SCHEDULED: "Upcoming",
     LIVE: "Live",
-    FINISHED: "Finished",
+    FINISHED: "FT",
     POSTPONED: "Postponed",
+    CANCELLED: "Cancelled",
   }[status];
   return <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${style}`}>{label}</span>;
 }
@@ -30,17 +33,24 @@ export function LocalKickoff({ value }: { value: Date | string }) {
 }
 
 export function MatchCard({ match }: { match: MatchWithPrediction }) {
-  const locked = match.status !== "SCHEDULED" || new Date(match.kickoffTime).getTime() <= Date.now();
+  const locked = match.status !== "SCHEDULED" || isPredictionLocked(match.kickoffTime);
   const hasKickedOff = new Date(match.kickoffTime).getTime() <= Date.now();
-  const showScore = hasKickedOff && (match.status === "FINISHED" || match.status === "LIVE");
+  const showScore = (hasKickedOff || match.status === "LIVE" || match.status === "FINISHED") && (match.status === "FINISHED" || match.status === "LIVE");
+  const lockTime = getPredictionLockTime(match.kickoffTime);
   return (
     <Card className="premium-card-gradient border-emerald-500/25 shadow-lg shadow-emerald-950/20 transition hover:border-lime-300/40">
       <CardContent className="space-y-5 p-5">
         <div className="flex items-center justify-between gap-2">
-          <StatusBadge status={match.status} />
+          <div className="flex items-center gap-2">
+            <StatusBadge status={match.status} />
+            {match.status === "LIVE" && match.minute !== null && <span className="rounded-full border border-red-400/30 bg-red-400/10 px-2 py-1 text-[11px] font-bold text-red-100">{match.minute}&apos;</span>}
+          </div>
           <span className="text-xs text-zinc-500">{match.groupName || match.stage}</span>
         </div>
         <div className="flex items-center gap-3 text-xs font-medium text-emerald-100"><CalendarClock className="h-4 w-4 text-lime-300" /><LocalKickoff value={match.kickoffTime} /></div>
+        <p className={`text-xs font-semibold ${locked ? "text-amber-200" : "text-emerald-100"}`}>
+          {locked ? "Predictions closed" : `Predictions close at ${formatMatchDateTime(lockTime)}`}
+        </p>
         <div className="grid grid-cols-1 items-center gap-3 text-center sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <TeamNameBadge teamName={match.homeTeam} align="center" className="w-full" />
           {showScore ? <span className="rounded-lg bg-slate-950 px-3 py-2 text-lg font-extrabold text-white shadow-sm dark:bg-white dark:text-slate-950">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</span> : <span className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">VS</span>}
