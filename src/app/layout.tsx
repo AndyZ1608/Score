@@ -13,6 +13,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "SCORE - World Cup 2026 Prediction League",
   description: "Predict match outcomes, score exact matches, and compete with friends in the ultimate World Cup 2026 Prediction game.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 }
 
 export default async function RootLayout({

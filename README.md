@@ -25,7 +25,7 @@ With Docker Compose production:
 docker compose exec app sh -lc 'CONFIRM_DELETE_TEST_USERS=true npm run db:delete-test-users'
 ```
 
-User avatars are assigned deterministically from the local files in `public/assets/avatar/ramdom*.jpg`, so they stay stable across refreshes without changing the database schema.
+User avatars are assigned deterministically from `public/assets/avatar/ramdom1.jpg` through `ramdom10.jpg`, so they stay stable across refreshes without changing the database schema. The favicon is served from `/favicon.png`; after deploy, hard refresh with Ctrl+F5 or open an incognito window if the browser tab still shows a cached icon.
 
 ## Cron manual
 

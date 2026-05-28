@@ -7,7 +7,7 @@ describe("getUserAvatar", () => {
   });
 
   it("uses the local ramdom avatar path", () => {
-    expect(getUserAvatar("score-user")).toMatch(/^\/assets\/avatar\/ramdom[1-8]\.jpg$/);
+    expect(getUserAvatar("score-user")).toMatch(/^\/assets\/avatar\/ramdom([1-9]|10)\.jpg$/);
   });
 
   it("falls back safely for empty seeds", () => {

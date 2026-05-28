@@ -1,4 +1,4 @@
-const AVAILABLE_AVATAR_COUNT = 8;
+const AVAILABLE_AVATAR_COUNT = 10;
 const FALLBACK_AVATAR_INDEX = 1;
 
 function hashSeed(seed: string) {
