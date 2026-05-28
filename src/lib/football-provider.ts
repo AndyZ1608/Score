@@ -5,14 +5,14 @@ export interface ExternalMatch {
   externalId: string;
   homeTeam: string;
   awayTeam: string;
-  homeTeamLogo?: string | null;
-  awayTeamLogo?: string | null;
+  homeTeamLogo?: string;
+  awayTeamLogo?: string;
   kickoffTime: Date;
   stadium?: string;
-  country?: string | null;
+  country?: string;
   stage?: string;
   groupName?: string;
-  round?: string | null;
+  round?: string;
   status: MatchStatus;
   homeScore: number | null;
   awayScore: number | null;
@@ -101,10 +101,10 @@ export function mockFixtures(now = new Date()): ExternalMatch[] {
         stadium,
         stage,
         groupName,
-        homeTeamLogo: null,
-        awayTeamLogo: null,
-        country: null,
-        round: null,
+        homeTeamLogo: undefined,
+        awayTeamLogo: undefined,
+        country: undefined,
+        round: undefined,
         status: normalizeMatchStatus(status),
         homeScore,
         awayScore,
@@ -156,12 +156,12 @@ export class FootballDataOrgProvider implements FootballDataProvider {
         homeTeam: String((raw.homeTeam as { name?: string })?.name ?? "TBD"),
         awayTeam: String((raw.awayTeam as { name?: string })?.name ?? "TBD"),
         kickoffTime: new Date(String(raw.utcDate)),
-        homeTeamLogo: null,
-        awayTeamLogo: null,
-        country: null,
+        homeTeamLogo: undefined,
+        awayTeamLogo: undefined,
+        country: undefined,
         stage: raw.stage ? String(raw.stage) : undefined,
         groupName: raw.group ? String(raw.group) : undefined,
-        round: null,
+        round: undefined,
         status,
         homeScore,
         awayScore,
@@ -194,7 +194,7 @@ export class TheSportsDBProvider implements FootballDataProvider {
     const events = payload.events ?? [];
     if (!Array.isArray(events)) throw new Error("TheSportsDB returned invalid events payload");
 
-    return events.map((event) => {
+    return events.map((event): ExternalMatch => {
       const homeScore = parseNullableInt(event.intHomeScore);
       const awayScore = parseNullableInt(event.intAwayScore);
       const status = normalizeTheSportsDBStatus(event, homeScore, awayScore);
@@ -205,14 +205,14 @@ export class TheSportsDBProvider implements FootballDataProvider {
         externalId: String(event.idEvent),
         homeTeam: String(event.strHomeTeam ?? "TBD"),
         awayTeam: String(event.strAwayTeam ?? "TBD"),
-        homeTeamLogo: nullableString(event.strHomeTeamBadge),
-        awayTeamLogo: nullableString(event.strAwayTeamBadge),
+        homeTeamLogo: emptyToUndefined(event.strHomeTeamBadge),
+        awayTeamLogo: emptyToUndefined(event.strAwayTeamBadge),
         kickoffTime,
-        stadium: nullableString(event.strVenue) ?? undefined,
-        country: nullableString(event.strCountry),
-        stage: nullableString(event.strLeague) ?? undefined,
-        groupName: null,
-        round: event.intRound === null || event.intRound === undefined ? null : String(event.intRound),
+        stadium: emptyToUndefined(event.strVenue),
+        country: emptyToUndefined(event.strCountry),
+        stage: emptyToUndefined(event.strLeague),
+        groupName: undefined,
+        round: emptyToUndefined(event.intRound),
         status,
         homeScore,
         awayScore,
@@ -243,15 +243,15 @@ function normalizeTheSportsDBStatus(event: Record<string, unknown>, homeScore: n
 }
 
 function parseTheSportsDBKickoff(event: Record<string, unknown>): Date {
-  const timestamp = nullableString(event.strTimestamp);
+  const timestamp = emptyToUndefined(event.strTimestamp);
   if (timestamp) {
     const normalized = /(?:z|[+-]\d{2}:?\d{2})$/i.test(timestamp) ? timestamp : `${timestamp}Z`;
     const parsed = new Date(normalized);
     if (!Number.isNaN(parsed.getTime())) return parsed;
   }
 
-  const date = nullableString(event.dateEvent);
-  const time = nullableString(event.strTime) ?? "00:00:00";
+  const date = emptyToUndefined(event.dateEvent);
+  const time = emptyToUndefined(event.strTime) ?? "00:00:00";
   const parsed = new Date(`${date ?? "1970-01-01"}T${time}Z`);
   if (!Number.isNaN(parsed.getTime())) return parsed;
   throw new Error(`Invalid TheSportsDB kickoff for event ${String(event.idEvent ?? "unknown")}`);
@@ -263,10 +263,10 @@ function parseNullableInt(value: unknown): number | null {
   return Number.isInteger(parsed) ? parsed : null;
 }
 
-function nullableString(value: unknown): string | null {
-  if (value === null || value === undefined) return null;
+function emptyToUndefined(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
   const stringValue = String(value).trim();
-  return stringValue ? stringValue : null;
+  return stringValue ? stringValue : undefined;
 }
 
 function getProviderMinute(raw: Record<string, unknown>): number | null {
