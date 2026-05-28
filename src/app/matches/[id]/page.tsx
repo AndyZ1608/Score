@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { LocalKickoff } from "@/components/match-card";
 import { PredictionForm } from "@/components/prediction-form";
+import { TeamNameBadge } from "@/components/team-name-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +16,15 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
   return (
     <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-[1.2fr_0.8fr]">
       <Card className="premium-card-gradient border-zinc-800">
-        <CardHeader><CardTitle>{match.homeTeam} vs {match.awayTeam}</CardTitle><p className="text-sm text-zinc-400"><LocalKickoff value={match.kickoffTime} /> | {match.stadium}</p></CardHeader>
+        <CardHeader className="space-y-4">
+          <CardTitle className="sr-only">{match.homeTeam} vs {match.awayTeam}</CardTitle>
+          <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+            <TeamNameBadge teamName={match.homeTeam} size="lg" align="center" className="w-full" />
+            <span className="rounded-full border border-slate-200 bg-white/95 px-4 py-2 text-sm font-black uppercase tracking-widest text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-950/85 dark:text-slate-200">vs</span>
+            <TeamNameBadge teamName={match.awayTeam} size="lg" align="center" className="w-full" />
+          </div>
+          <p className="text-center text-sm text-zinc-400"><LocalKickoff value={match.kickoffTime} /> | {match.stadium}</p>
+        </CardHeader>
         <CardContent className="space-y-6">
           {showScore && <div className="text-center text-5xl font-bold">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</div>}
           <PredictionForm matchId={match.id} homeTeam={match.homeTeam} awayTeam={match.awayTeam} prediction={prediction} locked={locked} />

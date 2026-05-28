@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CalendarClock, LockKeyhole } from "lucide-react";
 import type { Match, Prediction } from "@prisma/client";
 import { Card, CardContent } from "@/components/ui/card";
+import { TeamNameBadge } from "@/components/team-name-badge";
 
 export type MatchWithPrediction = Match & { prediction?: Prediction | null };
 
@@ -33,10 +34,10 @@ export function MatchCard({ match }: { match: MatchWithPrediction }) {
           <span className="text-xs text-zinc-500">{match.groupName || match.stage}</span>
         </div>
         <div className="flex items-center gap-3 text-xs text-zinc-400"><CalendarClock className="h-4 w-4 text-indigo-400" /><LocalKickoff value={match.kickoffTime} /></div>
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-center font-semibold">
-          <span>{match.homeTeam}</span>
-          {showScore ? <span className="rounded-lg bg-zinc-900 px-3 py-2 text-lg">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</span> : <span className="text-xs text-zinc-500">VS</span>}
-          <span>{match.awayTeam}</span>
+        <div className="grid grid-cols-1 items-center gap-3 text-center sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+          <TeamNameBadge teamName={match.homeTeam} align="center" className="w-full" />
+          {showScore ? <span className="rounded-lg bg-slate-950 px-3 py-2 text-lg font-extrabold text-white shadow-sm dark:bg-white dark:text-slate-950">{match.homeScore ?? "-"} : {match.awayScore ?? "-"}</span> : <span className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">VS</span>}
+          <TeamNameBadge teamName={match.awayTeam} align="center" className="w-full" />
         </div>
         {match.prediction && <div className="rounded-lg bg-zinc-900/80 px-3 py-2 text-sm text-zinc-300">Your prediction: <strong>{match.prediction.predictedHomeScore} - {match.prediction.predictedAwayScore}</strong>{match.prediction.isCalculated && <span className="float-right text-emerald-400">+{match.prediction.totalPoints} pts</span>}</div>}
         <Link href={`/matches/${match.id}`} className="flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
