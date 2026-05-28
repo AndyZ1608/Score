@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Award, CheckCircle2, Compass, Trophy } from "lucide-react";
+import { Award, CheckCircle2, ClipboardCheck, Trophy } from "lucide-react";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { DashboardStatCard } from "@/components/dashboard-stat-card";
+import { FootballHero } from "@/components/football-hero";
 import { MatchCard } from "@/components/match-card";
-import { Card, CardContent } from "@/components/ui/card";
 
 export default async function DashboardPage() {
   const { userId, username } = await requireAuth();
@@ -19,23 +20,46 @@ export default async function DashboardPage() {
     }),
   ]);
   const stats = [
-    ["Total Points", aggregate._sum.totalPoints ?? 0, Trophy],
-    ["Predictions Made", aggregate._count, Compass],
-    ["Exact Scores", exactScores, Award],
-    ["Correct Results", correctResults, CheckCircle2],
+    {
+      label: "Total Points",
+      value: aggregate._sum.totalPoints ?? 0,
+      description: "Your current tournament score",
+      icon: Trophy,
+      variant: "amber",
+    },
+    {
+      label: "Predictions Made",
+      value: aggregate._count,
+      description: "Submitted score predictions",
+      icon: ClipboardCheck,
+      variant: "sky",
+    },
+    {
+      label: "Exact Scores",
+      value: exactScores,
+      description: "Perfect scoreline calls",
+      icon: Award,
+      variant: "emerald",
+    },
+    {
+      label: "Correct Results",
+      value: correctResults,
+      description: "Winner or draw predicted",
+      icon: CheckCircle2,
+      variant: "rose",
+    },
   ] as const;
   return (
     <div className="space-y-9">
-      <section className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-7">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-2 text-zinc-400">Welcome, {username}. Your World Cup 2026 prediction overview.</p>
-      </section>
+      <FootballHero username={username} />
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map(([label, value, Icon]) => <Card key={label} className="premium-card-gradient border-zinc-800"><CardContent className="flex items-center justify-between p-5"><div><p className="text-xs text-zinc-400">{label}</p><p className="mt-2 text-3xl font-bold">{value}</p></div><Icon className="h-7 w-7 text-indigo-400" /></CardContent></Card>)}
+        {stats.map((stat) => (
+          <DashboardStatCard key={stat.label} {...stat} />
+        ))}
       </section>
       <section className="space-y-5">
-        <div className="flex items-center justify-between"><h2 className="text-xl font-semibold">Upcoming matches</h2><Link className="text-sm text-indigo-400 hover:text-indigo-300" href="/matches">View all matches</Link></div>
-        {upcoming.length ? <div className="grid gap-4 lg:grid-cols-2">{upcoming.map(({ predictions, ...match }) => <MatchCard key={match.id} match={{ ...match, prediction: predictions[0] ?? null }} />)}</div> : <p className="rounded-lg border border-zinc-800 p-8 text-center text-zinc-400">No upcoming matches.</p>}
+        <div className="flex items-center justify-between"><h2 className="text-xl font-bold text-white">Upcoming matches</h2><Link className="text-sm font-semibold text-lime-300 hover:text-lime-200" href="/matches">View all matches</Link></div>
+        {upcoming.length ? <div className="grid gap-4 lg:grid-cols-2">{upcoming.map(({ predictions, ...match }) => <MatchCard key={match.id} match={{ ...match, prediction: predictions[0] ?? null }} />)}</div> : <p className="rounded-2xl border border-emerald-500/25 bg-slate-950/80 p-8 text-center text-emerald-100">No upcoming matches.</p>}
       </section>
     </div>
   );

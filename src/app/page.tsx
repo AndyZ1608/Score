@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { getSession } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
+import { FootballHero } from "@/components/football-hero"
 import { Trophy, Calendar, ShieldCheck, ArrowRight, Zap, Target, Users } from "lucide-react"
 
 export default async function LandingPage() {
@@ -8,30 +9,19 @@ export default async function LandingPage() {
   const isLoggedIn = !!session.userId
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 md:py-24 space-y-20">
-      {/* Hero Section */}
+    <div className="flex flex-col items-center justify-center py-8 md:py-16 space-y-16">
+      <FootballHero />
       <div className="text-center max-w-3xl space-y-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wider uppercase">
-          <Zap className="h-3 w-3 text-indigo-400" />
-          World Cup 2026 Predictions
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/20 text-emerald-100 text-xs font-semibold tracking-wider uppercase">
+          <Zap className="h-3 w-3 text-lime-300" />
+          Score predictions, matchday bragging rights
         </div>
-        
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-zinc-50 via-zinc-150 to-zinc-400 bg-clip-text text-transparent">
-          Predict the Game. <br />
-          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Conquer the Leaderboard.
-          </span>
-        </h1>
-
-        <p className="text-base md:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-          Predict World Cup scores with your friends. Submit your score predictions for the 2026 tournament, earn points, and compete on the leaderboard.
-        </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
           {isLoggedIn ? (
             <Link href="/dashboard">
-              <Button size="lg" className="font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20">
+              <Button size="lg" className="font-bold bg-lime-300 hover:bg-lime-200 text-slate-950 shadow-lg shadow-lime-950/20">
                 Go to Dashboard
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -39,13 +29,13 @@ export default async function LandingPage() {
           ) : (
             <>
               <Link href="/register">
-                <Button size="lg" className="font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20">
+                <Button size="lg" className="font-bold bg-lime-300 hover:bg-lime-200 text-slate-950 shadow-lg shadow-lime-950/20">
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/login">
-                <Button size="lg" variant="outline" className="border-zinc-800 hover:bg-zinc-900 font-semibold">
+                <Button size="lg" variant="outline" className="border-emerald-500/30 bg-slate-950/40 hover:bg-emerald-500/10 font-semibold text-emerald-50">
                   Sign In
                 </Button>
               </Link>
@@ -60,7 +50,7 @@ export default async function LandingPage() {
         <div className="premium-card-gradient rounded-2xl p-8 flex flex-col justify-between shadow-xl">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <div className="p-2.5 rounded-lg bg-emerald-500/10 text-lime-300 border border-emerald-400/20">
                 <Target className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-bold text-zinc-100">Prediction Rules</h2>
@@ -82,7 +72,7 @@ export default async function LandingPage() {
               </div>
 
               <div className="flex items-start space-x-3">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold text-xs">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-lime-300/10 text-lime-300 border border-lime-300/20 font-bold text-xs">
                   +3
                 </div>
                 <div>
@@ -92,7 +82,7 @@ export default async function LandingPage() {
               </div>
 
               <div className="flex items-start space-x-3">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold text-xs">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-300/10 text-amber-300 border border-amber-300/20 font-bold text-xs">
                   4
                 </div>
                 <div>
@@ -112,7 +102,7 @@ export default async function LandingPage() {
         <div className="premium-card-gradient rounded-2xl p-8 flex flex-col justify-between shadow-xl">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              <div className="p-2.5 rounded-lg bg-emerald-500/10 text-lime-300 border border-emerald-400/20">
                 <Trophy className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-bold text-zinc-100">Why Join SCORE?</h2>

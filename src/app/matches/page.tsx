@@ -25,7 +25,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
   return (
     <div className="space-y-7">
       <div><h1 className="text-3xl font-bold">Matches</h1><p className="mt-2 text-zinc-400">World Cup 2026 fixtures and your predictions.</p></div>
-      <nav className="flex flex-wrap gap-2">{tabs.map(([label, value]) => <Link key={label} href={value ? `/matches?status=${value}` : "/matches"} className={`rounded-full px-4 py-2 text-sm ${selected === value || (!selected && !value) ? "bg-indigo-600 text-white" : "bg-zinc-900 text-zinc-300"}`}>{label}</Link>)}</nav>
+      <nav className="flex flex-wrap gap-2">{tabs.map(([label, value]) => <Link key={label} href={value ? `/matches?status=${value}` : "/matches"} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${selected === value || (!selected && !value) ? "bg-lime-300 text-slate-950 shadow-sm shadow-lime-950/20" : "border border-emerald-500/20 bg-slate-950/75 text-emerald-100 hover:bg-emerald-500/10"}`}>{label}</Link>)}</nav>
       {matches.length ? <div className="space-y-8">{groups.map((group) => <section key={group.date} className="space-y-4"><h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">{group.date}</h2><div className="grid gap-4 lg:grid-cols-2">{group.matches.map(({ predictions, ...match }) => <MatchCard key={match.id} match={{ ...match, prediction: predictions[0] ?? null }} />)}</div></section>)}</div> : <div className="rounded-lg border border-zinc-800 p-12 text-center text-zinc-400">No matches found.</div>}
     </div>
   );

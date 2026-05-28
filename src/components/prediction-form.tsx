@@ -47,8 +47,8 @@ export function PredictionForm({ matchId, homeTeam, awayTeam, prediction, locked
         <div className="space-y-2"><Label htmlFor="home" className="sr-only">{homeTeam}</Label><TeamNameBadge teamName={homeTeam} size="sm" className="w-full" /><Input id="home" type="number" min="0" step="1" value={home} onChange={(event) => setHome(event.target.value)} required /></div>
         <div className="space-y-2"><Label htmlFor="away" className="sr-only">{awayTeam}</Label><TeamNameBadge teamName={awayTeam} size="sm" className="w-full" /><Input id="away" type="number" min="0" step="1" value={away} onChange={(event) => setAway(event.target.value)} required /></div>
       </div>
-      {outcome && <p className="rounded-md bg-indigo-500/10 p-3 text-center text-sm text-indigo-300">Predicted result: {outcome}</p>}
-      <Button disabled={saving} className="w-full bg-emerald-600 text-white hover:bg-emerald-500">{saving ? "Saving..." : prediction ? "Update prediction" : "Submit prediction"}</Button>
+      {outcome && <p className="rounded-md border border-emerald-300/20 bg-emerald-500/10 p-3 text-center text-sm font-semibold text-emerald-100">Predicted result: {outcome}</p>}
+      <Button disabled={saving} className="w-full bg-lime-300 font-black text-slate-950 hover:bg-lime-200">{saving ? "Saving..." : prediction ? "Update prediction" : "Submit prediction"}</Button>
     </form>
   );
 }

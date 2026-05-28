@@ -53,13 +53,13 @@ export function Navbar() {
     "border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-100 hover:text-slate-950 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:hover:text-white"
 
   return (
-    <nav className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 border-b border-emerald-200/70 bg-white/95 shadow-sm shadow-emerald-950/5 backdrop-blur dark:border-emerald-500/20 dark:bg-slate-950/90">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between items-center">
           {/* Logo & Desktop Nav Links */}
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-2 text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              <span className="bg-zinc-900 text-zinc-50 px-2.5 py-1 rounded-md text-sm font-extrabold dark:bg-zinc-50 dark:text-zinc-900">
+              <span className="rounded-md bg-emerald-600 px-2.5 py-1 text-sm font-extrabold text-white shadow-sm shadow-emerald-900/25 dark:bg-lime-300 dark:text-slate-950">
                 SCORE
               </span>
             </Link>
@@ -73,8 +73,8 @@ export function Navbar() {
                     href={link.href}
                     className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                       isActive(link.href)
-                        ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
-                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+                        ? "bg-emerald-100 text-emerald-950 dark:bg-emerald-400/15 dark:text-emerald-100"
+                        : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-950 dark:text-slate-300 dark:hover:bg-emerald-400/10 dark:hover:text-white"
                     }`}
                   >
                     <Icon className="mr-2 h-4 w-4" />
@@ -129,7 +129,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-2 pt-2 pb-4 space-y-1">
+        <div className="space-y-1 border-t border-emerald-200/70 bg-white/95 px-2 pb-4 pt-2 dark:border-emerald-500/20 dark:bg-slate-950/95 md:hidden">
           {navLinks.map((link) => {
             const Icon = link.icon
             return (
@@ -139,8 +139,8 @@ export function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center px-3 py-2 text-base font-medium rounded-md ${
                   isActive(link.href)
-                    ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
-                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+                    ? "bg-emerald-100 text-emerald-950 dark:bg-emerald-400/15 dark:text-emerald-100"
+                    : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-950 dark:text-slate-300 dark:hover:bg-emerald-400/10 dark:hover:text-white"
                 }`}
               >
                 <Icon className="mr-3 h-5 w-5" />
