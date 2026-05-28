@@ -25,6 +25,8 @@ With Docker Compose production:
 docker compose exec app sh -lc 'CONFIRM_DELETE_TEST_USERS=true npm run db:delete-test-users'
 ```
 
+User avatars are assigned deterministically from the local files in `public/assets/avatar/ramdom*.jpg`, so they stay stable across refreshes without changing the database schema.
+
 ## Cron manual
 
 ```sh

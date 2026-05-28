@@ -51,7 +51,7 @@ export default async function DashboardPage() {
   ] as const;
   return (
     <div className="space-y-9">
-      <FootballHero username={username} />
+      <FootballHero username={username} userId={userId} />
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <DashboardStatCard key={stat.label} {...stat} />

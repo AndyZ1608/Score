@@ -4,6 +4,7 @@ import { ArrowRight, Trophy } from "lucide-react";
 import messiImage from "../../assets/messi.jpg";
 import ronaldoImage from "../../assets/ronaldo.jpg";
 import wcImage from "../../assets/wc2026.jpg";
+import { UserAvatar } from "@/components/user-avatar";
 
 const heroImages: Array<{ src: StaticImageData; alt: string; className: string; priority?: boolean }> = [
   {
@@ -24,7 +25,7 @@ const heroImages: Array<{ src: StaticImageData; alt: string; className: string; 
   },
 ];
 
-export function FootballHero({ username }: { username?: string }) {
+export function FootballHero({ username, userId }: { username?: string; userId?: string }) {
   return (
     <section className="relative overflow-hidden rounded-3xl border border-emerald-300/20 bg-gradient-to-br from-emerald-950 via-green-900 to-slate-950 p-6 shadow-2xl shadow-emerald-950/40 sm:p-8">
       <div className="football-pitch-lines absolute inset-0 opacity-35" aria-hidden="true" />
@@ -38,7 +39,10 @@ export function FootballHero({ username }: { username?: string }) {
             World Cup 2026 Predictor
           </div>
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-emerald-200">{username ? `Welcome back, ${username}` : "Football prediction league"}</p>
+            <div className="flex items-center gap-3">
+              {username && <UserAvatar seed={userId ?? username} name={username} size="lg" />}
+              <p className="text-sm font-semibold text-emerald-200">{username ? `Welcome back, ${username}` : "Football prediction league"}</p>
+            </div>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
               Predict the World Cup. Climb the leaderboard.
             </h1>
