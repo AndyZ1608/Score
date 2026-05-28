@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MatchStatus } from "@prisma/client";
 import { MatchCard } from "@/components/match-card";
 import { requireAuth } from "@/lib/auth";
+import { formatMatchDate } from "@/lib/date-format";
 import { prisma } from "@/lib/prisma";
 
 export default async function MatchesPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
@@ -14,7 +15,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
     include: { predictions: { where: { userId }, take: 1 } },
   });
   const groups = matches.reduce<Array<{ date: string; matches: typeof matches }>>((all, match) => {
-    const date = match.kickoffTime.toISOString().slice(0, 10);
+    const date = formatMatchDate(match.kickoffTime);
     const group = all.find((entry) => entry.date === date);
     if (group) group.matches.push(match);
     else all.push({ date, matches: [match] });

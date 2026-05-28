@@ -49,6 +49,8 @@ export function Navbar() {
   ]
 
   const isActive = (href: string) => pathname === href
+  const logoutButtonClass =
+    "border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-100 hover:text-slate-950 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:hover:text-white"
 
   return (
     <nav className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 sticky top-0 z-50">
@@ -90,7 +92,7 @@ export function Navbar() {
                 <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Hello, <span className="font-semibold">{username}</span>
                 </span>
-                <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center space-x-1">
+                <Button variant="outline" size="sm" onClick={handleLogout} className={`flex items-center space-x-1 font-medium ${logoutButtonClass}`}>
                   <LogOut className="h-4 w-4" />
                   <span>Logout</span>
                 </Button>
@@ -152,7 +154,7 @@ export function Navbar() {
                 <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Logged in as <span className="font-semibold">{username}</span>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => { setIsOpen(false); handleLogout(); }} className="w-full flex items-center justify-center space-x-1">
+                <Button variant="outline" size="sm" onClick={() => { setIsOpen(false); handleLogout(); }} className={`w-full flex items-center justify-center space-x-1 font-medium ${logoutButtonClass}`}>
                   <LogOut className="h-4 w-4" />
                   <span>Logout</span>
                 </Button>

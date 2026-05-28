@@ -5,6 +5,7 @@ import { CalendarClock, LockKeyhole } from "lucide-react";
 import type { Match, Prediction } from "@prisma/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { TeamNameBadge } from "@/components/team-name-badge";
+import { formatMatchDateTime } from "@/lib/date-format";
 
 export type MatchWithPrediction = Match & { prediction?: Prediction | null };
 
@@ -19,7 +20,7 @@ function StatusBadge({ status }: { status: Match["status"] }) {
 }
 
 export function LocalKickoff({ value }: { value: Date | string }) {
-  return <time dateTime={new Date(value).toISOString()} suppressHydrationWarning>{new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value))}</time>;
+  return <time dateTime={new Date(value).toISOString()}>{formatMatchDateTime(value)}</time>;
 }
 
 export function MatchCard({ match }: { match: MatchWithPrediction }) {

@@ -10,8 +10,20 @@ World Cup 2026 score prediction app built with Next.js, PostgreSQL, Prisma, encr
 4. Run `docker compose up -d --build`.
 5. Open [http://localhost](http://localhost) or `http://SERVER_IP`.
 
-The initial seed is idempotent. A demo account is available after first startup: `testuser` / `password123`.
+The initial seed is idempotent and only syncs mock fixtures; it does not create demo users.
 When serving through HTTPS, set `SESSION_COOKIE_SECURE="true"` in `.env`.
+
+To remove old demo/test users from an existing database:
+
+```sh
+CONFIRM_DELETE_TEST_USERS=true npm run db:delete-test-users
+```
+
+With Docker Compose production:
+
+```sh
+docker compose exec app sh -lc 'CONFIRM_DELETE_TEST_USERS=true npm run db:delete-test-users'
+```
 
 ## Cron manual
 
