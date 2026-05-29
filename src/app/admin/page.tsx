@@ -1,4 +1,5 @@
 import { AdminMatchResultForm } from "@/components/admin-match-result-form";
+import { AdminTabs } from "@/components/admin-tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireAdmin } from "@/lib/auth";
 import { formatMatchDateTime } from "@/lib/date-format";
@@ -15,6 +16,7 @@ export default async function AdminPage() {
         <h1 className="text-3xl font-black text-white">Admin Matches</h1>
         <p className="mt-2 text-sm font-medium text-slate-300">Override final results. Admin results are authoritative and will not be overwritten by provider sync.</p>
       </div>
+      <AdminTabs active="matches" />
       <div className="space-y-4">
         {matches.map((match) => (
           <Card key={match.id} className="rounded-2xl border border-slate-700 bg-slate-900/95 text-white shadow-lg shadow-slate-950/30">
