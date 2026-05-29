@@ -1,6 +1,5 @@
-import { Globe2 } from "lucide-react";
+import { TeamFlag } from "@/components/team-flag";
 import { cn } from "@/lib/utils";
-import { getTeamFlag } from "@/lib/team-flags";
 
 export function TeamNameBadge({
   teamName,
@@ -13,7 +12,6 @@ export function TeamNameBadge({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
-  const flag = getTeamFlag(teamName);
   const alignClass = {
     left: "justify-start text-left",
     center: "justify-center text-center",
@@ -24,11 +22,7 @@ export function TeamNameBadge({
     md: "gap-2.5 px-3 py-2.5 text-sm",
     lg: "gap-3 px-4 py-3 text-base sm:text-lg",
   }[size];
-  const flagClass = {
-    sm: "text-lg",
-    md: "text-xl",
-    lg: "text-2xl sm:text-3xl",
-  }[size];
+  const flagSize = size === "lg" ? "lg" : size === "sm" ? "sm" : "md";
 
   return (
     <span
@@ -40,13 +34,7 @@ export function TeamNameBadge({
       )}
       title={teamName}
     >
-      {flag ? (
-        <span className={cn("shrink-0 leading-none", flagClass)} aria-label={`${teamName} flag`} role="img">
-          {flag}
-        </span>
-      ) : (
-        <Globe2 className="h-5 w-5 shrink-0 text-slate-500 dark:text-slate-400" aria-hidden="true" />
-      )}
+      <TeamFlag teamName={teamName} size={flagSize} />
       <span className="min-w-0 truncate">{teamName}</span>
     </span>
   );
