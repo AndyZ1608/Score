@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers";
 import { UserAvatar } from "@/components/user-avatar";
-import { AVATAR_COUNT, getAvatarPathById, getFallbackAvatarId, isValidAvatarId } from "@/lib/user-avatar";
+import { AVATAR_IDS, getAvatarPathById, getFallbackAvatarId, isValidAvatarId } from "@/lib/user-avatar";
 
 export function AvatarPicker({
   userId,
@@ -102,7 +102,7 @@ export function AvatarPicker({
             {error && <p className="mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-400/40 dark:bg-red-400/10 dark:text-red-100">{error}</p>}
 
             <div className="mt-5 grid grid-cols-4 gap-3 sm:grid-cols-5">
-              {Array.from({ length: AVATAR_COUNT }, (_, index) => index + 1).map((nextAvatarId) => {
+              {AVATAR_IDS.map((nextAvatarId) => {
                 const isSelected = selected === nextAvatarId;
                 return (
                   <button
@@ -120,6 +120,7 @@ export function AvatarPicker({
                       alt={`Avatar ${nextAvatarId}`}
                       width={64}
                       height={64}
+                      unoptimized
                       className="h-full w-full rounded-full object-cover"
                     />
                     {saving === nextAvatarId && <span className="absolute inset-0 rounded-full bg-slate-950/50" aria-hidden="true" />}

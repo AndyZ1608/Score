@@ -52,6 +52,7 @@ export function UserAvatar({
           alt={`${displayName ?? "User"} avatar`}
           width={selectedSize.image}
           height={selectedSize.image}
+          unoptimized
           className="h-full w-full object-cover"
           onError={() => setFailed(true)}
         />

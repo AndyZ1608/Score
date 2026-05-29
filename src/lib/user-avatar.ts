@@ -1,4 +1,5 @@
 export const AVATAR_COUNT = 20;
+export const AVATAR_IDS = Array.from({ length: AVATAR_COUNT }, (_, index) => index + 1);
 const FALLBACK_AVATAR_ID = 1;
 
 function hashSeed(seed: string) {

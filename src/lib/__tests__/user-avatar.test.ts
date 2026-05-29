@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AVATAR_COUNT, getAvatarPathById, getFallbackAvatarId, getUserAvatarPath, isValidAvatarId } from "@/lib/user-avatar";
+import { AVATAR_COUNT, AVATAR_IDS, getAvatarPathById, getFallbackAvatarId, getUserAvatarPath, isValidAvatarId } from "@/lib/user-avatar";
 
 describe("user avatar helpers", () => {
   it("validates avatar IDs strictly", () => {
@@ -12,7 +12,12 @@ describe("user avatar helpers", () => {
 
   it("builds local avatar paths", () => {
     expect(AVATAR_COUNT).toBe(20);
+    expect(AVATAR_IDS).toHaveLength(20);
+    expect(AVATAR_IDS.slice(-3)).toEqual([18, 19, 20]);
     expect(getAvatarPathById(5)).toBe("/assets/avatar/ramdom5.jpg");
+    expect(getAvatarPathById(18)).toBe("/assets/avatar/ramdom18.jpg");
+    expect(getAvatarPathById(19)).toBe("/assets/avatar/ramdom19.jpg");
+    expect(getAvatarPathById(20)).toBe("/assets/avatar/ramdom20.jpg");
   });
 
   it("returns stable fallback IDs within range", () => {
