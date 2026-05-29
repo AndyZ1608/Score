@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getActiveMatchWhere } from "@/lib/provider-config";
 
 export async function GET() {
   const session = await getSession();
   if (!session.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const users = await prisma.user.findMany({
     where: { role: "USER", isHidden: false },
-    select: { id: true, username: true, predictions: { select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } },
+    select: { id: true, username: true, predictions: { where: { match: { is: getActiveMatchWhere() } }, select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } },
   });
   const leaderboard = users
     .map((user) => ({

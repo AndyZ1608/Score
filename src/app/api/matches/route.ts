@@ -2,6 +2,7 @@ import { MatchStatus, Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getActiveMatchWhere } from "@/lib/provider-config";
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -10,7 +11,7 @@ export async function GET(request: Request) {
   const status = params.get("status");
   const date = params.get("date");
   const stage = params.get("stage");
-  const where: Prisma.MatchWhereInput = {};
+  const where: Prisma.MatchWhereInput = getActiveMatchWhere();
   if (status && Object.values(MatchStatus).includes(status as MatchStatus)) where.status = status as MatchStatus;
   if (stage) where.stage = stage;
   if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {

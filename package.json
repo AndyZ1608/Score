@@ -14,6 +14,9 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:create-admin": "tsx scripts/create-admin.ts",
+    "db:verify-admin": "tsx scripts/verify-admin.ts",
+    "db:cleanup-mock-matches": "tsx scripts/cleanup-mock-matches.ts",
+    "db:verify-matches": "tsx scripts/verify-matches.ts",
     "db:delete-test-users": "tsx scripts/delete-test-users.ts",
     "db:studio": "prisma studio"
   },

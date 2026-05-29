@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireAdmin } from "@/lib/auth";
 import { formatMatchDateTime } from "@/lib/date-format";
 import { prisma } from "@/lib/prisma";
+import { getActiveMatchWhere } from "@/lib/provider-config";
 
 export default async function AdminPage() {
   await requireAdmin();
-  const matches = await prisma.match.findMany({ orderBy: { kickoffTime: "asc" } });
+  const matches = await prisma.match.findMany({ where: getActiveMatchWhere(), orderBy: { kickoffTime: "asc" } });
 
   return (
     <div className="space-y-7">

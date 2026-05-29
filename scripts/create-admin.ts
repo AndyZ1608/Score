@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 async function main() {
   const username = process.env.ADMIN_USERNAME;
   const password = process.env.ADMIN_PASSWORD;
-  if (!username || !password) throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD are required");
+  const displayName = process.env.ADMIN_DISPLAY_NAME || username;
+  if (!username || !password) throw new Error("Missing ADMIN_USERNAME or ADMIN_PASSWORD");
   if (password.length < 12) throw new Error("ADMIN_PASSWORD must be at least 12 characters");
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -16,7 +17,8 @@ async function main() {
     create: { username, passwordHash, role: UserRole.ADMIN, isHidden: true },
   });
 
-  console.log(`Admin user ensured: ${username}`);
+  void displayName;
+  console.log(`Admin account created/updated: ${username}`);
 }
 
 main()

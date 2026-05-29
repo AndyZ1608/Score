@@ -5,15 +5,17 @@ import { prisma } from "@/lib/prisma";
 import { DashboardStatCard } from "@/components/dashboard-stat-card";
 import { FootballHero } from "@/components/football-hero";
 import { MatchCard } from "@/components/match-card";
+import { getActiveMatchWhere } from "@/lib/provider-config";
 
 export default async function DashboardPage() {
   const { userId, username } = await requireAuth();
+  const activeMatchWhere = getActiveMatchWhere();
   const [aggregate, correctResults, exactScores, upcoming] = await Promise.all([
-    prisma.prediction.aggregate({ where: { userId }, _sum: { totalPoints: true }, _count: true }),
-    prisma.prediction.count({ where: { userId, pointsResult: 1 } }),
-    prisma.prediction.count({ where: { userId, pointsExactScore: 3 } }),
+    prisma.prediction.aggregate({ where: { userId, match: { is: activeMatchWhere } }, _sum: { totalPoints: true }, _count: true }),
+    prisma.prediction.count({ where: { userId, pointsResult: 1, match: { is: activeMatchWhere } } }),
+    prisma.prediction.count({ where: { userId, pointsExactScore: 3, match: { is: activeMatchWhere } } }),
     prisma.match.findMany({
-      where: { status: "SCHEDULED", kickoffTime: { gt: new Date() } },
+      where: { ...activeMatchWhere, status: "SCHEDULED", kickoffTime: { gt: new Date() } },
       orderBy: { kickoffTime: "asc" },
       take: 5,
       include: { predictions: { where: { userId }, take: 1 } },

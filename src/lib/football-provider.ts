@@ -1,5 +1,6 @@
 import { MatchResult, MatchStatus } from "@prisma/client";
 import { normalizeMatchStatus } from "./match-status";
+import { assertProviderAllowed, getConfiguredFootballProvider, getTheSportsDBConfig } from "./provider-config";
 
 export interface ExternalMatch {
   externalId: string;
@@ -180,12 +181,7 @@ export class FootballDataOrgProvider implements FootballDataProvider {
 
 export class TheSportsDBProvider implements FootballDataProvider {
   async fetchMatches(): Promise<ExternalMatch[]> {
-    const apiKey = process.env.THESPORTSDB_API_KEY;
-    const leagueId = process.env.THESPORTSDB_LEAGUE_ID;
-    const season = process.env.THESPORTSDB_SEASON || "2026";
-    const baseUrl = process.env.THESPORTSDB_BASE_URL || "https://www.thesportsdb.com/api/v1/json";
-    if (!apiKey) throw new Error("THESPORTSDB_API_KEY is required when FOOTBALL_API_PROVIDER=thesportsdb");
-    if (!leagueId) throw new Error("THESPORTSDB_LEAGUE_ID is required when FOOTBALL_API_PROVIDER=thesportsdb");
+    const { apiKey, leagueId, season, baseUrl } = getTheSportsDBConfig();
 
     const response = await fetch(`${baseUrl}/${apiKey}/eventsseason.php?id=${leagueId}&s=${season}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`TheSportsDB request failed (${response.status})`);
@@ -276,12 +272,13 @@ function getProviderMinute(raw: Record<string, unknown>): number | null {
 }
 
 export function getProvider(): FootballDataProvider {
-  const configuredProvider = process.env.FOOTBALL_API_PROVIDER;
-  if (!configuredProvider && process.env.NODE_ENV === "production") {
+  const configuredProvider = getConfiguredFootballProvider();
+  if (!process.env.FOOTBALL_API_PROVIDER && process.env.NODE_ENV === "production") {
     throw new Error("FOOTBALL_API_PROVIDER must be configured in production");
   }
+  assertProviderAllowed();
 
-  switch (configuredProvider || "mock") {
+  switch (configuredProvider) {
     case "mock":
       return new MockProvider();
     case "football-data-org":

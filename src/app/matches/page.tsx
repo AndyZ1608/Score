@@ -4,13 +4,14 @@ import { MatchCard } from "@/components/match-card";
 import { requireAuth } from "@/lib/auth";
 import { formatMatchDate } from "@/lib/date-format";
 import { prisma } from "@/lib/prisma";
+import { getActiveMatchWhere } from "@/lib/provider-config";
 
 export default async function MatchesPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const { userId } = await requireAuth();
   const { status } = await searchParams;
   const selected = Object.values(MatchStatus).includes(status as MatchStatus) ? status as MatchStatus : undefined;
   const matches = await prisma.match.findMany({
-    where: selected ? { status: selected } : {},
+    where: { ...getActiveMatchWhere(), ...(selected ? { status: selected } : {}) },
     orderBy: { kickoffTime: "asc" },
     include: { predictions: { where: { userId }, take: 1 } },
   });

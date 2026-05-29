@@ -48,6 +48,85 @@ curl -X POST http://localhost/api/cron/calculate-scores \
 Run the sync endpoint manually or from a weekly VM cron; it will not delete missing matches or overwrite admin result overrides.
 Admin users can open `/admin` to override final scores; saving an override recalculates predictions for that match immediately.
 
+## Production Update: TheSportsDB
+
+### Step 1: Edit `.env`
+
+```sh
+nano .env
+```
+
+Set:
+
+```env
+FOOTBALL_API_PROVIDER="thesportsdb"
+THESPORTSDB_API_KEY="123"
+THESPORTSDB_LEAGUE_ID="4429"
+THESPORTSDB_SEASON="2026"
+THESPORTSDB_BASE_URL="https://www.thesportsdb.com/api/v1/json"
+
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="CHANGE_ME_STRONG_PASSWORD"
+ADMIN_DISPLAY_NAME="System Admin"
+```
+
+### Step 2: Recreate containers
+
+```sh
+docker compose up -d --build --force-recreate
+```
+
+### Step 3: Verify env inside container
+
+```sh
+docker compose exec app printenv | grep -E "ADMIN|FOOTBALL|THESPORTSDB"
+```
+
+Expected:
+
+```text
+FOOTBALL_API_PROVIDER=thesportsdb
+THESPORTSDB_API_KEY=123
+THESPORTSDB_LEAGUE_ID=4429
+THESPORTSDB_SEASON=2026
+```
+
+### Step 4: Run migration
+
+```sh
+docker compose exec app npx prisma migrate deploy
+```
+
+### Step 5: Create admin
+
+```sh
+docker compose exec app npm run db:create-admin
+docker compose exec app npm run db:verify-admin
+```
+
+### Step 6: Cleanup mock matches
+
+```sh
+docker compose exec app sh -lc 'CONFIRM_CLEANUP_MOCK_MATCHES=true npm run db:cleanup-mock-matches'
+```
+
+### Step 7: Sync TheSportsDB
+
+```sh
+curl -s -X POST http://localhost/api/cron/sync-matches \
+  -H "Authorization: Bearer YOUR_CRON_SECRET" | jq
+```
+
+Expected: `provider=thesportsdb` and `fetched=15`.
+
+### Step 8: Verify DB matches
+
+```sh
+docker compose exec app npm run db:verify-matches
+```
+
+Expected: `source thesportsdb visible = 15`, `source mock visible = 0`, and archived mock count if any.
+
 ## Dev mode
 
 ```sh

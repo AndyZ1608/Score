@@ -16,12 +16,12 @@ async function main() {
       void awayScore;
       void minute;
       void actualResult;
-      await prisma.match.update({ where: { id: existing.id }, data: { ...providerData, lastSyncedAt: lastUpdatedAt } });
+      await prisma.match.update({ where: { id: existing.id }, data: { ...providerData, isArchived: false, lastSyncedAt: lastUpdatedAt } });
     } else {
       await prisma.match.upsert({
         where: { externalId: fixture.externalId },
-        update: { ...matchData, lastSyncedAt: lastUpdatedAt },
-        create: { ...matchData, lastSyncedAt: lastUpdatedAt },
+        update: { ...matchData, isArchived: false, lastSyncedAt: lastUpdatedAt },
+        create: { ...matchData, isArchived: false, lastSyncedAt: lastUpdatedAt },
       });
     }
   }

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getResult } from "@/lib/scoring";
 import { predictionUpdateSchema } from "@/lib/validators";
 import { isPredictionLocked, PREDICTION_LOCKED_MESSAGE } from "@/lib/prediction-lock";
+import { isMatchVisibleForActiveProvider } from "@/lib/provider-config";
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -14,6 +15,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const existing = await prisma.prediction.findUnique({ where: { id }, include: { match: true } });
   if (!existing) return NextResponse.json({ error: "Prediction not found" }, { status: 404 });
+  if (!isMatchVisibleForActiveProvider(existing.match)) return NextResponse.json({ error: "Prediction not found" }, { status: 404 });
   if (existing.userId !== session.userId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   if (existing.match.status !== MatchStatus.SCHEDULED || isPredictionLocked(existing.match.kickoffTime)) {
     return NextResponse.json({ error: PREDICTION_LOCKED_MESSAGE }, { status: 403 });

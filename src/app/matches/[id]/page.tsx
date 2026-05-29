@@ -6,11 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isPredictionLocked } from "@/lib/prediction-lock";
+import { isMatchVisibleForActiveProvider } from "@/lib/provider-config";
 
 export default async function MatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { userId } = await requireAuth();
   const match = await prisma.match.findUnique({ where: { id: (await params).id }, include: { predictions: { where: { userId }, take: 1 } } });
-  if (!match) notFound();
+  if (!match || !isMatchVisibleForActiveProvider(match)) notFound();
   const prediction = match.predictions[0] ?? null;
   const locked = match.status !== "SCHEDULED" || isPredictionLocked(match.kickoffTime);
   const showScore = (match.kickoffTime <= new Date() || match.status === "LIVE" || match.status === "FINISHED") && (match.status === "FINISHED" || match.status === "LIVE");

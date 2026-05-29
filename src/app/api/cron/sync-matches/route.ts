@@ -4,11 +4,13 @@ import { type ExternalMatch, getProvider } from "@/lib/football-provider";
 import { prisma } from "@/lib/prisma";
 import { calculateScoresForMatch } from "@/lib/scoring";
 import { shouldCalculateScore } from "@/lib/match-status";
+import { getConfiguredFootballProvider, getProviderDebugInfo } from "@/lib/provider-config";
 
 export async function POST(request: Request) {
   if (!isAuthorizedCron(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const providerName = process.env.FOOTBALL_API_PROVIDER || "unconfigured";
+  const providerName = getConfiguredFootballProvider();
   try {
+    const providerInfo = getProviderDebugInfo();
     const matches = await getProvider().fetchMatches();
     let created = 0;
     let updated = 0;
@@ -51,7 +53,16 @@ export async function POST(request: Request) {
     await prisma.syncLog.create({
       data: { provider: providerName, jobType: "SYNC_MATCHES", status: errors.length ? "PARTIAL_SUCCESS" : "SUCCESS", message: `${matches.length} fetched; ${created} created; ${updated} updated; ${skipped} skipped; ${scoresCalculated} predictions calculated` },
     });
-    return NextResponse.json({ provider: providerName, fetched: matches.length, created, updated, skipped, errors, scoresCalculated });
+    return NextResponse.json({
+      ...providerInfo,
+      ...(providerName === "mock" ? { warning: "Mock provider is active" } : {}),
+      fetched: matches.length,
+      created,
+      updated,
+      skipped,
+      errors,
+      scoresCalculated,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sync failed";
     await prisma.syncLog.create({ data: { provider: providerName, jobType: "SYNC_MATCHES", status: "FAILED", message } });
@@ -73,6 +84,7 @@ function toProviderMatchData(match: ExternalMatch) {
     groupName: match.groupName ?? null,
     round: match.round ?? null,
     source: match.source,
+    isArchived: false,
     providerHomeScore: match.providerHomeScore,
     providerAwayScore: match.providerAwayScore,
     providerStatus: match.providerStatus,
