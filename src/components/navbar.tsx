@@ -7,7 +7,7 @@ import { Menu, X, Trophy, Calendar, LayoutDashboard, LogOut, Shield } from "luci
 import { useSession } from "@/components/providers"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
-import { UserAvatar } from "@/components/user-avatar"
+import { AvatarPicker } from "@/components/avatar-picker"
 
 export function Navbar() {
   const { userId, username, role, avatarId, refresh } = useSession()
@@ -92,7 +92,7 @@ export function Navbar() {
             {userId ? (
               <div className="flex items-center space-x-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  <UserAvatar user={{ id: userId, username, avatarId }} size="sm" />
+                  <AvatarPicker userId={userId} username={username ?? "User"} avatarId={avatarId} size="sm" />
                   <span>Hello, <span className="font-semibold">{username}</span></span>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleLogout} className={`flex items-center space-x-1 font-medium ${logoutButtonClass}`}>
@@ -155,7 +155,7 @@ export function Navbar() {
             {userId ? (
               <div className="px-3 space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  <UserAvatar user={{ id: userId, username, avatarId }} size="sm" />
+                  <AvatarPicker userId={userId} username={username ?? "User"} avatarId={avatarId} size="sm" />
                   <span>Logged in as <span className="font-semibold">{username}</span></span>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => { setIsOpen(false); handleLogout(); }} className={`w-full flex items-center justify-center space-x-1 font-medium ${logoutButtonClass}`}>

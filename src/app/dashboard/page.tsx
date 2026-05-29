@@ -6,7 +6,6 @@ import { DashboardStatCard } from "@/components/dashboard-stat-card";
 import { FootballHero } from "@/components/football-hero";
 import { MatchCard } from "@/components/match-card";
 import { getActiveMatchWhere } from "@/lib/provider-config";
-import { AvatarPicker } from "@/components/avatar-picker";
 
 export default async function DashboardPage() {
   const { userId, username, avatarId } = await requireAuth();
@@ -55,7 +54,6 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-9">
       <FootballHero username={username} userId={userId} avatarId={avatarId} />
-      <AvatarPicker userId={userId} username={username} avatarId={avatarId} />
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <DashboardStatCard key={stat.label} {...stat} />
