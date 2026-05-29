@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers";
 import { UserAvatar } from "@/components/user-avatar";
@@ -23,6 +24,11 @@ export function AvatarPicker({
   const [selected, setSelected] = useState(isValidAvatarId(avatarId) ? avatarId : getFallbackAvatarId(userId ?? username));
   const [saving, setSaving] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setSelected(isValidAvatarId(avatarId) ? avatarId : getFallbackAvatarId(userId ?? username));
@@ -74,8 +80,8 @@ export function AvatarPicker({
         <UserAvatar user={{ id: userId, username, avatarId: selected }} size={size} />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4" onMouseDown={() => setOpen(false)}>
+      {mounted && open && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4" onMouseDown={() => setOpen(false)}>
           <div
             role="dialog"
             aria-modal="true"
@@ -122,7 +128,8 @@ export function AvatarPicker({
               })}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
