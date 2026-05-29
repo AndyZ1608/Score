@@ -52,15 +52,15 @@ export function AdminMatchResultForm({ match }: { match: AdminMatchResultFormMat
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-3 sm:grid-cols-[80px_80px_150px_auto]">
-      <Input type="number" min="0" step="1" value={homeScore} onChange={(event) => setHomeScore(event.target.value)} className="bg-white text-slate-950 dark:bg-slate-950 dark:text-white" aria-label={`${match.homeTeam} score`} />
-      <Input type="number" min="0" step="1" value={awayScore} onChange={(event) => setAwayScore(event.target.value)} className="bg-white text-slate-950 dark:bg-slate-950 dark:text-white" aria-label={`${match.awayTeam} score`} />
-      <select value={status} onChange={(event) => setStatus(event.target.value as MatchStatus)} className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
+    <form onSubmit={submit} className="grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4 sm:grid-cols-[90px_90px_160px_auto]">
+      <Input type="number" min="0" step="1" value={homeScore} onChange={(event) => setHomeScore(event.target.value)} className="border-slate-300 bg-white text-center text-lg font-black text-slate-950 focus-visible:ring-2 focus-visible:ring-emerald-400/50 dark:border-slate-600 dark:bg-slate-950 dark:text-white" aria-label={`${match.homeTeam} score`} />
+      <Input type="number" min="0" step="1" value={awayScore} onChange={(event) => setAwayScore(event.target.value)} className="border-slate-300 bg-white text-center text-lg font-black text-slate-950 focus-visible:ring-2 focus-visible:ring-emerald-400/50 dark:border-slate-600 dark:bg-slate-950 dark:text-white" aria-label={`${match.awayTeam} score`} />
+      <select value={status} onChange={(event) => setStatus(event.target.value as MatchStatus)} className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-950 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 dark:border-slate-600 dark:bg-slate-950 dark:text-white">
         {ADMIN_STATUSES.map((value) => (
           <option key={value} value={value}>{value}</option>
         ))}
       </select>
-      <Button type="submit" disabled={saving} className="bg-lime-300 font-black text-slate-950 hover:bg-lime-200">
+      <Button type="submit" disabled={saving} className="bg-emerald-500 font-black text-white hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300">
         {saving ? "Saving..." : "Save override"}
       </Button>
     </form>

@@ -68,6 +68,10 @@ THESPORTSDB_BASE_URL="https://www.thesportsdb.com/api/v1/json"
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="CHANGE_ME_STRONG_PASSWORD"
 ADMIN_DISPLAY_NAME="System Admin"
+
+TELEGRAM_BOT_TOKEN=""
+TELEGRAM_CHAT_ID=""
+TELEGRAM_NOTIFY_REGISTRATION="true"
 ```
 
 ### Step 2: Recreate containers
@@ -102,6 +106,12 @@ docker compose exec app npx prisma migrate deploy
 ```sh
 docker compose exec app npm run db:create-admin
 docker compose exec app npm run db:verify-admin
+```
+
+Optional Telegram registration notification test:
+
+```sh
+docker compose exec app npm run test:telegram
 ```
 
 ### Step 6: Cleanup mock matches

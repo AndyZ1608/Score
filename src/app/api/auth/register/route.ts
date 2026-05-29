@@ -2,6 +2,8 @@ import { Prisma, UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getSession, hashPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { formatMatchDateTime } from "@/lib/date-format";
+import { sendTelegramMessage } from "@/lib/telegram";
 import { registerSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
@@ -18,6 +20,7 @@ export async function POST(request: Request) {
     session.username = user.username;
     session.role = user.role;
     await session.save();
+    await sendTelegramMessage(`🟢 New Score registration\n👤 Username: ${user.username}\n🕒 Time: ${formatMatchDateTime(user.createdAt)}`);
     return NextResponse.json({ user }, { status: 201 });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
