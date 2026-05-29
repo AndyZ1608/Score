@@ -4,7 +4,7 @@ import { ArrowRight, Trophy } from "lucide-react";
 import messiImage from "../../assets/messi.jpg";
 import ronaldoImage from "../../assets/ronaldo.jpg";
 import wcImage from "../../assets/wc2026.jpg";
-import { AvatarPicker } from "@/components/avatar-picker";
+import { UserAvatar } from "@/components/user-avatar";
 
 const heroImages: Array<{ src: StaticImageData; alt: string; className: string; priority?: boolean }> = [
   {
@@ -40,7 +40,7 @@ export function FootballHero({ username, userId, avatarId }: { username?: string
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              {username && userId && <AvatarPicker userId={userId} username={username} avatarId={avatarId} size="lg" />}
+              {username && <UserAvatar user={{ id: userId ?? username, username, avatarId }} size="lg" />}
               <p className="text-sm font-semibold text-emerald-200">{username ? `Welcome back, ${username}` : "Football prediction league"}</p>
             </div>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
