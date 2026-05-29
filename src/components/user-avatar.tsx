@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { getUserAvatar } from "@/lib/user-avatar";
+import { getUserAvatarPath } from "@/lib/user-avatar";
 
 function initials(name?: string) {
   return name?.trim().slice(0, 2).toUpperCase() || "SC";
@@ -16,18 +16,24 @@ const sizes = {
 };
 
 export function UserAvatar({
+  user,
   seed,
   name,
+  avatarId,
   size = "md",
   className,
 }: {
+  user?: { id?: string | number | null; username?: string | null; avatarId?: number | null };
   seed?: string | number | null;
   name?: string | null;
+  avatarId?: number | null;
   size?: keyof typeof sizes;
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
   const selectedSize = sizes[size];
+  const avatarUser = user ?? { id: seed, username: name, avatarId };
+  const displayName = avatarUser.username ?? name;
 
   return (
     <span
@@ -36,14 +42,14 @@ export function UserAvatar({
         selectedSize.wrapper,
         className,
       )}
-      title={name ?? "User avatar"}
+      title={displayName ?? "User avatar"}
     >
       {failed ? (
-        <span>{initials(name ?? undefined)}</span>
+        <span>{initials(displayName ?? undefined)}</span>
       ) : (
         <Image
-          src={getUserAvatar(seed ?? name)}
-          alt={`${name ?? "User"} avatar`}
+          src={getUserAvatarPath(avatarUser)}
+          alt={`${displayName ?? "User"} avatar`}
           width={selectedSize.image}
           height={selectedSize.image}
           className="h-full w-full object-cover"

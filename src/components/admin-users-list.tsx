@@ -14,6 +14,7 @@ const DELETE_PREDICTIONS_LABEL = "Predictions s\u1ebd b\u1ecb x\u00f3a:";
 export interface AdminUserRow {
   id: string;
   username: string;
+  avatarId?: number | null;
   createdAt: string | Date;
   predictionCount: number;
   totalPoints: number;
@@ -55,7 +56,7 @@ export function AdminUsersList({ initialUsers }: { initialUsers: AdminUserRow[] 
             <article key={user.id} className="rounded-2xl border border-slate-700 bg-slate-900/95 p-4 text-white shadow-lg shadow-slate-950/30">
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                 <div className="flex min-w-0 items-center gap-4">
-                  <UserAvatar seed={user.id} name={user.username} size="md" />
+                  <UserAvatar user={{ id: user.id, username: user.username, avatarId: user.avatarId }} size="md" />
                   <div className="min-w-0">
                     <h2 className="truncate text-lg font-black text-white">{user.username}</h2>
                     <p className="text-sm font-medium text-slate-300">Created: {formatMatchDateTime(user.createdAt)}</p>

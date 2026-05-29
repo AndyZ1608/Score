@@ -16,6 +16,7 @@ export async function GET() {
     select: {
       id: true,
       username: true,
+      avatarId: true,
       createdAt: true,
       role: true,
       isHidden: true,
@@ -29,6 +30,7 @@ export async function GET() {
     users: users.map((user) => ({
       id: user.id,
       username: user.username,
+      avatarId: user.avatarId,
       createdAt: user.createdAt,
       role: user.role,
       isHidden: user.isHidden,

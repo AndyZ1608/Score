@@ -8,12 +8,13 @@ export async function GET() {
   if (!session.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const users = await prisma.user.findMany({
     where: { role: "USER", isHidden: false },
-    select: { id: true, username: true, predictions: { where: { match: { is: getActiveMatchWhere() } }, select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } },
+    select: { id: true, username: true, avatarId: true, predictions: { where: { match: { is: getActiveMatchWhere() } }, select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } },
   });
   const leaderboard = users
     .map((user) => ({
       userId: user.id,
       username: user.username,
+      avatarId: user.avatarId,
       totalPoints: user.predictions.reduce((sum, prediction) => sum + prediction.totalPoints, 0),
       correctResults: user.predictions.filter((prediction) => prediction.pointsResult === 1).length,
       exactScores: user.predictions.filter((prediction) => prediction.pointsExactScore === 3).length,

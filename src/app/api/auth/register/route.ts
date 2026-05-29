@@ -13,12 +13,13 @@ export async function POST(request: Request) {
   try {
     const user = await prisma.user.create({
       data: { username: parsed.data.username, passwordHash: await hashPassword(parsed.data.password), role: UserRole.USER, isHidden: false },
-      select: { id: true, username: true, role: true, createdAt: true },
+      select: { id: true, username: true, role: true, avatarId: true, createdAt: true },
     });
     const session = await getSession();
     session.userId = user.id;
     session.username = user.username;
     session.role = user.role;
+    session.avatarId = user.avatarId;
     await session.save();
     await sendTelegramMessage(`🟢 New Score registration\n👤 Username: ${user.username}\n🕒 Time: ${formatMatchDateTime(user.createdAt)}`);
     return NextResponse.json({ user }, { status: 201 });

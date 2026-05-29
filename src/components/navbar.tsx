@@ -10,7 +10,7 @@ import { toast } from "@/components/ui/toast"
 import { UserAvatar } from "@/components/user-avatar"
 
 export function Navbar() {
-  const { userId, username, role, refresh } = useSession()
+  const { userId, username, role, avatarId, refresh } = useSession()
   const pathname = usePathname()
   const router = useRouter()
   const [isOpen, setIsOpen] = React.useState(false)
@@ -92,7 +92,7 @@ export function Navbar() {
             {userId ? (
               <div className="flex items-center space-x-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  <UserAvatar seed={userId} name={username} size="sm" />
+                  <UserAvatar user={{ id: userId, username, avatarId }} size="sm" />
                   <span>Hello, <span className="font-semibold">{username}</span></span>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleLogout} className={`flex items-center space-x-1 font-medium ${logoutButtonClass}`}>
@@ -155,7 +155,7 @@ export function Navbar() {
             {userId ? (
               <div className="px-3 space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  <UserAvatar seed={userId} name={username} size="sm" />
+                  <UserAvatar user={{ id: userId, username, avatarId }} size="sm" />
                   <span>Logged in as <span className="font-semibold">{username}</span></span>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => { setIsOpen(false); handleLogout(); }} className={`w-full flex items-center justify-center space-x-1 font-medium ${logoutButtonClass}`}>

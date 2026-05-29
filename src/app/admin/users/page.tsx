@@ -11,6 +11,7 @@ export default async function AdminUsersPage() {
     select: {
       id: true,
       username: true,
+      avatarId: true,
       createdAt: true,
       predictions: {
         select: { totalPoints: true, pointsResult: true, pointsExactScore: true },
@@ -21,7 +22,8 @@ export default async function AdminUsersPage() {
   const rows = users.map((user) => ({
     id: user.id,
     username: user.username,
-    createdAt: user.createdAt,
+    avatarId: user.avatarId,
+    createdAt: user.createdAt.toISOString(),
     predictionCount: user.predictions.length,
     totalPoints: user.predictions.reduce((total, prediction) => total + prediction.totalPoints, 0),
     exactScores: user.predictions.filter((prediction) => prediction.pointsExactScore === 3).length,

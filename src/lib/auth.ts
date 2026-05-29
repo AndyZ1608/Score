@@ -9,6 +9,7 @@ export interface SessionData {
   userId?: string;
   username?: string;
   role?: UserRole;
+  avatarId?: number | null;
 }
 
 function getSessionOptions(): SessionOptions {
@@ -36,7 +37,7 @@ export async function getSession() {
 export async function requireAuth() {
   const session = await getSession();
   if (!session.userId || !session.username) redirect("/login");
-  return { userId: session.userId, username: session.username, role: session.role ?? UserRole.USER };
+  return { userId: session.userId, username: session.username, role: session.role ?? UserRole.USER, avatarId: session.avatarId ?? null };
 }
 
 export async function requireAdmin() {

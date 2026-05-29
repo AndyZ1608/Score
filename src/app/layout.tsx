@@ -27,7 +27,7 @@ export default async function RootLayout({
 }) {
   const session = await getSession()
   const initialUser = session.userId
-    ? { userId: session.userId, username: session.username, role: session.role }
+    ? { userId: session.userId, username: session.username, role: session.role, avatarId: session.avatarId }
     : undefined
 
   return (

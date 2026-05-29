@@ -5,10 +5,11 @@ import { getActiveMatchWhere } from "@/lib/provider-config";
 
 export default async function LeaderboardPage() {
   const { userId } = await requireAuth();
-  const users = await prisma.user.findMany({ where: { role: "USER", isHidden: false }, select: { id: true, username: true, predictions: { where: { match: { is: getActiveMatchWhere() } }, select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } } });
+  const users = await prisma.user.findMany({ where: { role: "USER", isHidden: false }, select: { id: true, username: true, avatarId: true, predictions: { where: { match: { is: getActiveMatchWhere() } }, select: { totalPoints: true, pointsResult: true, pointsExactScore: true } } } });
   const rows = users.map((user) => ({
     userId: user.id,
     username: user.username,
+    avatarId: user.avatarId,
     totalPoints: user.predictions.reduce((total, prediction) => total + prediction.totalPoints, 0),
     correctResults: user.predictions.filter((prediction) => prediction.pointsResult === 1).length,
     exactScores: user.predictions.filter((prediction) => prediction.pointsExactScore === 3).length,

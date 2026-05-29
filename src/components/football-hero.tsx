@@ -25,7 +25,7 @@ const heroImages: Array<{ src: StaticImageData; alt: string; className: string; 
   },
 ];
 
-export function FootballHero({ username, userId }: { username?: string; userId?: string }) {
+export function FootballHero({ username, userId, avatarId }: { username?: string; userId?: string; avatarId?: number | null }) {
   return (
     <section className="relative overflow-hidden rounded-3xl border border-emerald-300/20 bg-gradient-to-br from-emerald-950 via-green-900 to-slate-950 p-6 shadow-2xl shadow-emerald-950/40 sm:p-8">
       <div className="football-pitch-lines absolute inset-0 opacity-35" aria-hidden="true" />
@@ -40,7 +40,7 @@ export function FootballHero({ username, userId }: { username?: string; userId?:
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              {username && <UserAvatar seed={userId ?? username} name={username} size="lg" />}
+              {username && <UserAvatar user={{ id: userId ?? username, username, avatarId }} size="lg" />}
               <p className="text-sm font-semibold text-emerald-200">{username ? `Welcome back, ${username}` : "Football prediction league"}</p>
             </div>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">

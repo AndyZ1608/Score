@@ -6,6 +6,7 @@ export interface LeaderboardRow {
   rank: number;
   userId: string;
   username: string;
+  avatarId?: number | null;
   totalPoints: number;
   correctResults: number;
   exactScores: number;
@@ -21,7 +22,7 @@ export function LeaderboardTable({ rows, currentUserId }: { rows: LeaderboardRow
         <TableBody>
           {rows.map((row) => <TableRow key={row.userId} className={cn(row.userId === currentUserId && "bg-indigo-500/10")}>
             <TableCell className="font-semibold">#{row.rank}</TableCell>
-            <TableCell><div className="flex items-center gap-3"><UserAvatar seed={row.userId} name={row.username} size="sm" /><span>{row.username}{row.userId === currentUserId && <small className="ml-2 text-emerald-300">(you)</small>}</span></div></TableCell>
+            <TableCell><div className="flex items-center gap-3"><UserAvatar user={{ id: row.userId, username: row.username, avatarId: row.avatarId }} size="sm" /><span>{row.username}{row.userId === currentUserId && <small className="ml-2 text-emerald-300">(you)</small>}</span></div></TableCell>
             <TableCell className="hidden sm:table-cell">{row.totalPredictions}</TableCell>
             <TableCell className="hidden md:table-cell">{row.correctResults}</TableCell>
             <TableCell className="hidden md:table-cell">{row.exactScores}</TableCell>

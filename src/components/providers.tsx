@@ -7,6 +7,7 @@ interface SessionContextType {
   userId?: string
   username?: string
   role?: string
+  avatarId?: number | null
   isLoading: boolean
   refresh: () => Promise<void>
 }
@@ -21,12 +22,13 @@ export function SessionProvider({
   initialUser,
 }: {
   children: React.ReactNode
-  initialUser?: { userId?: string; username?: string; role?: string }
+  initialUser?: { userId?: string; username?: string; role?: string; avatarId?: number | null }
 }) {
-  const [session, setSession] = React.useState<{ userId?: string; username?: string; role?: string }>({
+  const [session, setSession] = React.useState<{ userId?: string; username?: string; role?: string; avatarId?: number | null }>({
     userId: initialUser?.userId,
     username: initialUser?.username,
     role: initialUser?.role,
+    avatarId: initialUser?.avatarId,
   })
   const [isLoading, setIsLoading] = React.useState(!initialUser)
 
@@ -40,6 +42,7 @@ export function SessionProvider({
             userId: data.user.id,
             username: data.user.username,
             role: data.user.role,
+            avatarId: data.user.avatarId,
           })
         } else {
           setSession({})
@@ -77,7 +80,7 @@ export function Providers({
   initialUser,
 }: {
   children: React.ReactNode
-  initialUser?: { userId?: string; username?: string; role?: string }
+  initialUser?: { userId?: string; username?: string; role?: string; avatarId?: number | null }
 }) {
   return (
     <SessionProvider initialUser={initialUser}>
