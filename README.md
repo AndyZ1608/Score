@@ -48,6 +48,65 @@ curl -X POST http://localhost/api/cron/calculate-scores \
 Run the sync endpoint manually or from a weekly VM cron; it will not delete missing matches or overwrite admin result overrides.
 Admin users can open `/admin` to override final scores; saving an override recalculates predictions for that match immediately.
 
+## Daily Score Sync
+
+The production VM should run the full provider sync and scoring flow once per day at 14:00 Vietnam time. The script calls `sync-matches` first and only calls `calculate-scores` if the sync request succeeds.
+
+Prepare the script on the VM:
+
+```sh
+cd /root/Score
+chmod +x scripts/run-daily-score-sync.sh
+```
+
+Test it manually:
+
+```sh
+APP_DIR=/root/Score SCORE_BASE_URL=http://127.0.0.1:8080 /root/Score/scripts/run-daily-score-sync.sh
+```
+
+Install the crontab:
+
+```sh
+crontab -e
+```
+
+Add:
+
+```cron
+CRON_TZ=Asia/Ho_Chi_Minh
+0 14 * * * APP_DIR=/root/Score SCORE_BASE_URL=http://127.0.0.1:8080 /root/Score/scripts/run-daily-score-sync.sh >> /var/log/score-daily-sync.log 2>&1
+```
+
+Check the crontab and logs:
+
+```sh
+crontab -l
+tail -n 100 /var/log/score-daily-sync.log
+```
+
+Production deploy checklist:
+
+```sh
+npm run build
+cd /root/Score
+git pull origin main
+docker compose up -d --build --force-recreate
+curl -I http://127.0.0.1:8080
+```
+
+Manual endpoint verification:
+
+```sh
+CRON_SECRET=$(grep '^CRON_SECRET=' .env | cut -d= -f2- | tr -d '"')
+
+curl -s -X POST http://127.0.0.1:8080/api/cron/sync-matches \
+  -H "Authorization: Bearer $CRON_SECRET" | jq
+
+curl -s -X POST http://127.0.0.1:8080/api/cron/calculate-scores \
+  -H "Authorization: Bearer $CRON_SECRET" | jq
+```
+
 ## Production Update: TheSportsDB
 
 ### Step 1: Edit `.env`

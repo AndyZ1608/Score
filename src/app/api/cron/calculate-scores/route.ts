@@ -8,7 +8,12 @@ export async function POST(request: Request) {
   try {
     const summary = await calculateAllFinishedMatches();
     await prisma.syncLog.create({
-      data: { provider: "internal", jobType: "CALCULATE_SCORES", status: "SUCCESS", message: `${summary.matchesCalculated} matches calculated` },
+      data: {
+        provider: "internal",
+        jobType: "CALCULATE_SCORES",
+        status: summary.errors.length ? "PARTIAL_SUCCESS" : "SUCCESS",
+        message: `${summary.processedMatches} matches processed; ${summary.updatedPredictions} predictions updated; ${summary.updatedUsers} users updated; ${summary.errors.length} errors`,
+      },
     });
     return NextResponse.json(summary);
   } catch (error) {

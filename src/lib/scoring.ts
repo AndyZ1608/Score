@@ -32,7 +32,7 @@ export async function calculateScoresForMatch(matchId: string) {
   const match = await prisma.match.findUnique({ where: { id: matchId } });
   if (!match) throw new Error(`Match with ID ${matchId} not found`);
   if (match.status !== MatchStatus.FINISHED || match.homeScore === null || match.awayScore === null) {
-    return { matchId, calculated: 0 };
+    return { matchId, calculated: 0, updatedUsers: 0, updatedUserIds: [] as string[] };
   }
 
   const actualResult = getResult(match.homeScore, match.awayScore);
@@ -50,7 +50,8 @@ export async function calculateScoresForMatch(matchId: string) {
     ),
   );
 
-  return { matchId, calculated: predictions.length };
+  const updatedUserIds = Array.from(new Set(predictions.map((prediction) => prediction.userId)));
+  return { matchId, calculated: predictions.length, updatedUsers: updatedUserIds.length, updatedUserIds };
 }
 
 export async function calculateAllFinishedMatches() {
@@ -59,9 +60,27 @@ export async function calculateAllFinishedMatches() {
     select: { id: true },
   });
   let predictionsCalculated = 0;
+  const updatedUserIds = new Set<string>();
+  let matchesCalculated = 0;
+  const errors: string[] = [];
+
   for (const match of matches) {
-    const result = await calculateScoresForMatch(match.id);
-    predictionsCalculated += result.calculated;
+    try {
+      const result = await calculateScoresForMatch(match.id);
+      predictionsCalculated += result.calculated;
+      result.updatedUserIds.forEach((userId) => updatedUserIds.add(userId));
+      matchesCalculated += 1;
+    } catch (error) {
+      errors.push(`${match.id}: ${error instanceof Error ? error.message : "Unknown calculation error"}`);
+    }
   }
-  return { matchesCalculated: matches.length, predictionsCalculated };
+
+  return {
+    processedMatches: matchesCalculated,
+    updatedPredictions: predictionsCalculated,
+    updatedUsers: updatedUserIds.size,
+    errors,
+    matchesCalculated,
+    predictionsCalculated,
+  };
 }
